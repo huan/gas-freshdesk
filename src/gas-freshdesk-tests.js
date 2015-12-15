@@ -6,8 +6,11 @@ function freshdeskTestRunner() {
   
   var test = new GasTap()
   
-  var FRESHDESK_URL = 'https://mikebo.freshdesk.com'
-  var FRESHDESK_KEY = 'Jrg0FQNzX3tzuHbiFjYQ' // agent 'zixia@zixia.net' at 'https://mikebo.freshdesk.com'
+  // This is my test account, don't worry, thanks. ;]
+  var FRESHDESK_URL = 'https://mikebo.freshdesk.com' 
+  
+  // key for agent 'zixia@zixia.net' at 'https://mikebo.freshdesk.com'
+  var FRESHDESK_KEY = 'Jrg0FQNzX3tzuHbiFjYQ'         
   
   /******************************************************************
   *
@@ -111,6 +114,9 @@ function freshdeskTestRunner() {
       
       t.ok(newTicket.del(), 'delete newTicket')
       
+      t.ok(newTicket.restore(), 'restore newTicket')
+      
+      t.ok(newTicket.del(), 'delete newTicket again')
       
       var EXAMPLE_TICKET_WITH_ATTACHMENTS = {
         'helpdesk_ticket': {

@@ -5,53 +5,6 @@ if ((typeof GasLog)==='undefined') { // GasL Initialization. (only if not initia
 var log = new GasLog()
 
 function testFreshdeskAssignTicket() {  
-
-
-  var MyFreshdesk = new Freshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
-  
-
-  oldTicket = new MyFreshdesk.Ticket(1)
-  
-  oldTicket.addNote({
-    
-    helpdesk_note: {
-      body: 'Hi tom, Still Angry'
-      , private: true
-      , attachments: [ 
-        {resource: Utilities.newBlob('TEST DATA').setName('test-data.dat')}
-        , {resource: Utilities.newBlob('TEST DATA2').setName('test-data2.dat')}
-      ]
-      
-    }
-  })
-  
-  Logger.log(oldTicket.getId())
-  
-  
-  return
-  
-  // Update  
-  oldTicket.setPriority(1)
-  oldTicket.setStatus(2)
-  oldTicket.setCustomField({'x': 'y'})
-  oldTicket.setTag(['tag1', 'tag2'])
-  
-  
-  // Delete
-  oldTicket.del()
-  oldTicket.restore()
-  
-  
-  oldTicket.addNote({
-    body: "Hi tom, Still Angry"
-    , private: false
-    , attachments: [ [resource] ]
-  })
-  
-  var user = new MyFreshdesk.Contact({
-    id: 333
-  })
-  
   user.setName('xxx')
   user.setTitle('xxx')
   
@@ -116,7 +69,7 @@ var Freshdesk = (function () {
     }
     
     
-    /**
+    /******************************************************************
     *
     * Class Ticket
     *
@@ -156,8 +109,10 @@ var Freshdesk = (function () {
       this.getId = getTicketId
       this.getResponderId = getResponderId
       this.assign = assignTicket
-      this.del = deleteTicket
       this.addNote = addTicketNote
+
+      this.del = deleteTicket
+      this.restore = restoreTicket
       
       this.getPriority = getTicketPriority
       this.setPriority = setTicketPriority
@@ -221,6 +176,24 @@ var Freshdesk = (function () {
         return false
       }
 
+      /**
+      *
+      * @tested
+      */
+      function restoreTicket(id) {
+        
+        if (!id) id = getTicketId()
+        
+        if (id%1 !== 0) throw Error('ticket id(' + id + ') must be integer')
+        
+        var ret = http.put('/helpdesk/tickets/' + id + '/restore.json')
+        if (ret[0].ticket.deleted === false) {
+          reloadTicket(getTicketId()) // refresh
+          return this
+        }
+        
+        throw Error('restore fail')       
+      }
       
       /**
       *
@@ -253,6 +226,11 @@ var Freshdesk = (function () {
       }
 
       
+      /**
+      *
+      *
+      * @tested
+      */
       function getTicketPriority() { return ticketObj.helpdesk_ticket.priority }
       function setTicketPriority(priority) {
         var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
@@ -269,6 +247,11 @@ var Freshdesk = (function () {
         throw Error('set priority fail')  
       }
 
+      /**
+      *
+      *
+      * @tested
+      */
       function getTicketStatus() { return ticketObj.helpdesk_ticket.status }      
       function setTicketStatus(status) {
         var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
