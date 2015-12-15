@@ -1,9 +1,15 @@
+
 function freshdeskTestRunner() {
+  'use strict'
+  
+  if ((typeof GasLog)==='undefined') { // GasL Initialization. (only if not initialized yet.)
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gasl/master/src/gas-log-lib.js').getContentText())
+  } // Class GasLog is ready for use now!
+  var log = new GasLog()
   
   if ((typeof GasTap)==='undefined') { // GasT Initialization. (only if not initialized yet.)
     eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gast/master/src/gas-tap-lib.js').getContentText())
   } // Class GasTap is ready for use now!
-  
   var test = new GasTap()
   
   // This is my test account, don't worry, thanks. ;]
@@ -11,21 +17,68 @@ function freshdeskTestRunner() {
   
   // key for agent 'zixia@zixia.net' at 'https://mikebo.freshdesk.com'
   var FRESHDESK_KEY = 'Jrg0FQNzX3tzuHbiFjYQ'         
+
+  
+//  return development()
+  
   
   /******************************************************************
   *
   * Test cases
   *
   */
-//  testHttpBackend()
-//  testUtils()
-//  
-//  testFreshdeskAuth()
+
+  testHttpBackend()
+  testUtils()
+  
+  testFreshdeskAuth()
+
   testFreshdeskTicket()
+  testFreshdeskContact()
+  testFreshdeskAgent()
 
   test.finish()
   
   ////////////////////////////////////////////////////////////////////////  
+  
+  function development() {
+  }
+  
+  function testFreshdeskAgent() {
+    
+    test ('Agent', function (t) {
+      var EMAIL = 'zixia@zixia.net'
+      
+      var MyFreshdesk = new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
+      
+      var agent = MyFreshdesk.listAgents({ email: EMAIL })
+      
+      t.ok(agent.getName(), 'agent has name')
+      t.ok(agent.getId(), 'agent has id')
+    })
+  }
+  
+  function testFreshdeskContact() {
+    
+    test ('Contact', function (t) {
+      var EMAIL = 'you@example.com'
+      var EXPECTED_NAME = 'expected name'
+      
+      var MyFreshdesk = new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
+      
+      var contact = MyFreshdesk.listContacts({ email: EMAIL })
+      
+      t.ok(contact.getName(), 'contact has name')
+      
+      contact.setName(EXPECTED_NAME)
+      t.equal(contact.getName(), EXPECTED_NAME, 'contact name as expected')
+      
+      contact.setName('You You')
+      
+      t.ok(contact.getId(), 'contact has id')
+    })
+    
+  }
   
   function testUtils() {
     
@@ -60,7 +113,7 @@ function freshdeskTestRunner() {
     
     test('Ticket', function (t) {
       var TICKET_ID = 1
-      var EXPECTED_ID = 9000658396
+      var EXPECTED_ID = 9000658396 // Agent ID of Mike@zixia.net
 
       var MyFreshdesk = new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
       var oldTicket = new MyFreshdesk.Ticket(TICKET_ID)

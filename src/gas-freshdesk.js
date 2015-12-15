@@ -1,19 +1,5 @@
-if ((typeof GasLog)==='undefined') { // GasL Initialization. (only if not initialized yet.)
-  eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gasl/master/src/gas-log-lib.js').getContentText())
-} // Class GasLog is ready for use now!
-
-var log = new GasLog()
-
-function testFreshdeskAssignTicket() {  
-  user.setName('xxx')
-  user.setTitle('xxx')
-  
-  
-}
-
-
-
 var Freshdesk = (function () {
+  'use strict'
   
   /******************************************
   *
@@ -41,7 +27,8 @@ var Freshdesk = (function () {
     this.Contact = freshdeskContact
     
     this.listTickets = freshdeskListTickets
-    
+    this.listContacts = freshdeskListContacts
+    this.listAgents = freshdeskListAgents
     
     return this
     
@@ -58,9 +45,7 @@ var Freshdesk = (function () {
     * Method Search Ticket
     *
     * now only return the first one
-    *
     * TODO: implement search functions
-    *
     */
     function freshdeskListTickets(options) {
       var data = http.get('/helpdesk/tickets/filter/all_tickets?format=json')
@@ -69,6 +54,50 @@ var Freshdesk = (function () {
     }
     
     
+    /**
+    *
+    * Method Search Contact
+    *
+    * now only return the first one
+    * TODO: implement search fun7ctions
+    */
+    function freshdeskListContacts(options) {
+      
+      var email = options.email
+      
+      var data = http.get('/contacts.json?state=all&query=email%20is%20' + email)
+      
+      if (data && data[0] && data[0].user && data[0].user.id) {
+        var id = data[0].user.id
+        return new freshdeskContact(id)
+      }
+      
+      return null
+    }
+    
+    /**
+    *
+    * Method Search Agent
+    *
+    * now only return the first one
+    * TODO: implement search functions
+    */
+    function freshdeskListAgents(options) {
+      
+      var email = options.email
+      
+      var data = http.get('/agents.json?state=all&query=email%20is%20' + email)
+//      Logger.log(JSON.stringify(data))
+      if (data && data[0] && data[0].agent && data[0].agent.id) {
+        var id = data[0].agent.id
+        return new freshdeskAgent(id)
+      }
+      
+      if (data.access_denied) throw Error('acess denied')
+      
+      return null
+    }
+
     /******************************************************************
     *
     * Class Ticket
@@ -312,9 +341,208 @@ var Freshdesk = (function () {
     }// Seprator of Ticket Instance
     ////////////////////////////////
     
-    function freshdeskContact() {
+    /***************************************************************************
+    *
+    * Class Contact
+    *
+    */
+    function freshdeskContact(options) {
       
-    }
+      if ((typeof this) === 'undefined') return new freshdeskContact(options)
+      
+      var contactObj = {}
+      
+      if ((typeof options) === 'number') { 
+        
+        /**
+        * 1. existing contact, get it by ID
+        */
+        
+        id = options
+        
+        // load #id to contactObj
+        reloadContact(id)
+//        Logger.log('outside reloadTicket')
+//        Logger.log(ticketObj)
+
+      } else if ((typeof options) === 'object') { // { x: y } options
+        
+        /**
+        * 2. new contact. create it.
+        */
+        
+        contactObj = http.post('/contacts.json', options)
+        
+      } else {
+        // 3. error.
+        throw Error('options must be integer or options')        
+      } 
+      
+      this.getId = getContactId
+
+      this.del = deleteContact
+            
+      this.getName = getContactName
+      this.setName = setContactName
+      
+      this.getTitle = getContactTitle
+      this.setTitle = setContactTitle
+      
+      this.getRawObj = function () { return contactObj }
+
+      
+      return this
+
+      
+      function getContactId() {
+        if (contactObj && contactObj.user && contactObj.user.id) {
+          return contactObj.user.id
+        }
+        
+        return null
+      }
+      
+      function deleteContact() {
+        if ('deleted'==http.del('/contacts/' + getContactId() + '.json')) {
+          reloadContact(getContactId()) // refresh
+          return true
+        }
+        return false
+      }
+      
+      /**
+      *
+      * Reload Contact Object Raw Data
+      *
+      */
+      function reloadContact(id) {
+        
+        if ((typeof id)=='undefined') id = getContactId()
+        
+        if (id%1 !== 0) throw Error('contact id(' + id + ') must be integer.')
+        
+        contactObj = http.get('/contacts/' + id + '.json')
+
+        return this
+      }
+          
+      /**
+      *
+      *
+      * @testing
+      */
+      function getContactName() { 
+        return contactObj.user.name 
+      }
+      function setContactName(name) {
+        var retVal = http.put('/contacts/' + getContactId() + '.json', {
+          user: {
+            name: name
+          }
+        })
+        
+        if (retVal) {
+          reloadContact()
+          return this
+        }
+        
+        throw Error('set name fail')  
+      }
+
+      /**
+      *
+      *
+      * @testing
+      */
+      function getContactTitle() { return contactObj.user.job_title }      
+      function setContactTitle(title) {
+        var retVal = http.put('/contacts/' + getTicketId() + '.json', {
+          user: {
+            job_title: title
+          }
+        })
+        
+        if (retVal) {
+          reloadContact()
+          return this
+        }
+        
+        throw Error('set status fail')  
+      }
+      
+      
+      ////////////////////////////////
+    }// Seprator of Contact Instance
+    ////////////////////////////////
+
+    
+    /***************************************************************************
+    *
+    * Class Agent
+    *
+    */
+    function freshdeskAgent(id) {
+      
+      if ((typeof this) === 'undefined') return new freshdeskAgent(options)
+      
+      var agentObj = {}
+      
+      if ((typeof id) === 'number') { 
+        
+        /**
+        * 1. existing agent, get it by ID
+        */
+               
+        // load #id to agentObj
+        reloadAgent(id)
+
+      } else {
+        // 2. error.
+        throw Error('id must be integer')        
+      } 
+      
+      this.getId = getAgentId
+      this.getName = getAgentName
+      
+      this.getRawObj = function () { return agentObj }
+
+      
+      return this
+
+      ///////////////////////////////////////////////
+      
+      function getAgentId() {
+        if (agentObj && agentObj.agent && agentObj.agent.id) {
+          return agentObj.agent.id
+        }
+        
+        return null
+      }
+
+      function getAgentName() { 
+        return agentObj.agent.user.name 
+      }
+      
+      /**
+      *
+      * Reload Agent Object Raw Data
+      *
+      */
+      function reloadAgent(id) {
+        
+        if ((typeof id)=='undefined') id = getAgentId()
+        
+        if (id%1 !== 0) throw Error('agent id(' + id + ') must be integer.')
+        
+        agentObj = http.get('/agents/' + id + '.json')
+
+        return this
+      }
+      
+      ////////////////////////////////
+    }// Seprator of Agent Instance
+    ////////////////////////////////
+
   }
   
   
