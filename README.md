@@ -1,4 +1,4 @@
-# GasFreshdesk - Javascript OO Class for Freshdesk API
+# GasFreshdesk - OO Class for Freshdesk API
 GasFreshdesk is a easy to use Freshdesk API Class for GAS(Google Apps Script)
 
 Github: https://github.com/zixia/gas-freshdesk
