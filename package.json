@@ -1,0 +1,30 @@
+{
+  "name": "gas-freshdesk"
+  , "version": "0.1.0"
+  , "description": "GasFreshdesk is a wrapper class for Freshdesk API in GAS(Google Apps Script). It provides a easy way to deal with tickets in GAS"
+  , "main": "index.js"
+  , "directories": {
+    "doc": "doc"
+  }
+  , "dependencies": {
+  }
+  , "devDependencies": {
+    "node-google-apps-script": "^1.1.3"
+  }
+  , "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+    , "pull": "scripts/pull.sh"
+  }
+  , "repository": {
+    "type": "git"
+    , "url": "git@github.com:zixia/gas-freshdesk.git"
+  }
+  , "keywords": [
+    "freshdesk"
+    , "google-apps-script"
+    , "gas"
+  ]
+  , "author": "Zhuohuan LI <zixia@zixia.net>"
+  , "license": "MIT"
+  , "homepage": "https://github.com/zixia/gas-freshdesk"
+}
