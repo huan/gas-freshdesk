@@ -1,7 +1,7 @@
 function freshdeskTestRunner() {
   
   if ((typeof GasTap)==='undefined') { // GasT Initialization. (only if not initialized yet.)
-    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gast/master/src/gas-tap-lib.js?2').getContentText())
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gast/master/src/gas-tap-lib.js').getContentText())
   } // Class GasTap is ready for use now!
   
   var test = new GasTap()
@@ -9,13 +9,49 @@ function freshdeskTestRunner() {
   var FRESHDESK_URL = 'https://mikebo.freshdesk.com'
   var FRESHDESK_KEY = 'Jrg0FQNzX3tzuHbiFjYQ' // agent 'zixia@zixia.net' at 'https://mikebo.freshdesk.com'
   
+  /******************************************************************
+  *
+  * Test cases
+  *
+  */
 //  testHttpBackend()
+//  testUtils()
+//  
 //  testFreshdeskAuth()
   testFreshdeskTicket()
 
   test.finish()
   
   ////////////////////////////////////////////////////////////////////////  
+  
+  function testUtils() {
+    
+    test ('Attachment Helper', function (t) {
+      var HAS_ATTACHMENT = {
+        a: {
+          b: {
+            attachments: [1,2]
+          }
+        }
+      }
+      
+      var NO_ATTACHMENT = {
+        a: {
+          b: {
+            haha: [1,2]
+          }
+        }
+      }
+      
+      var http = Freshdesk.Http('a','b')
+      
+      var hasAtt = http.hasAttachment(HAS_ATTACHMENT)
+      t.ok(hasAtt, 'HAS_ATTACHMENT has attachment')
+      
+      var noAtt = http.hasAttachment(NO_ATTACHMENT)
+      t.ok(!noAtt, 'NO_ATTACHMENT has NO attachment')
+    })
+  }
   
   function testFreshdeskTicket() {
     
@@ -47,7 +83,32 @@ function freshdeskTestRunner() {
       t.equal(newTicket.getResponderId(), null, 'new ticket default no responder')
       newTicket.assign(MIKE_RESPONDER_ID)
       t.equal(newTicket.getResponderId(), MIKE_RESPONDER_ID, 'assigned to mike')
-            
+
+      
+      var numNotes = newTicket.getRawObj().helpdesk_ticket.notes.length
+
+      newTicket.addNote({
+        helpdesk_note: {
+          body: 'Hi tom, Still Angry'
+          , private: true
+          , attachments: [ 
+            {resource: Utilities.newBlob('TEST DATA').setName('test-data.dat')}
+            , {resource: Utilities.newBlob('TEST DATA2').setName('test-data2.dat')}
+          ]
+        }
+      })
+      
+      t.equal(newTicket.getRawObj().helpdesk_ticket.notes.length, numNotes+1, 'new note created')
+      
+      
+      var priority = newTicket.getPriority()
+      newTicket.setPriority(priority+1)
+      t.equal(newTicket.getPriority(), priority+1, 'inc priority by 1')
+      
+      var status = newTicket.getStatus()
+      newTicket.setStatus(status+1)
+      t.equal(newTicket.getStatus(), status+1, 'inc status by 1')
+      
       t.ok(newTicket.del(), 'delete newTicket')
       
       

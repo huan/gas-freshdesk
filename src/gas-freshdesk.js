@@ -1,3 +1,9 @@
+if ((typeof GasLog)==='undefined') { // GasL Initialization. (only if not initialized yet.)
+  eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gasl/master/src/gas-log-lib.js').getContentText())
+} // Class GasLog is ready for use now!
+
+var log = new GasLog()
+
 function testFreshdeskAssignTicket() {  
 
 
@@ -153,6 +159,12 @@ var Freshdesk = (function () {
       this.del = deleteTicket
       this.addNote = addTicketNote
       
+      this.getPriority = getTicketPriority
+      this.setPriority = setTicketPriority
+      
+      this.getStatus = getTicketStatus
+      this.setStatus = setTicketStatus
+      
       this.getRawObj = function () { return ticketObj }
       
       // Update
@@ -163,11 +175,8 @@ var Freshdesk = (function () {
       
       
       // Delete
-      //      this.del = deleteTicket // can't use this.delete because delete is the reserve keyword
       //      this.restore = restoreTicket
       //
-      //      this.assign = assignTicket
-      //      this.addNote = addTicketNote
       
 
       return this
@@ -213,25 +222,109 @@ var Freshdesk = (function () {
       }
 
       
+      /**
+      *
+      * Reload Ticket Object Raw Data
+      *
+      */
       function reloadTicket(id) {
         
         if (id%1 !== 0) throw Error('ticket id(' + id + ') must be integer.')
         
-//        Logger.log(id)
-        
         ticketObj = http.get('/helpdesk/tickets/' + id + '.json')
-        
-//        Logger.log('inside reloadTicket')
-//        Logger.log(ticketObj)
         
         return this
       }
     
+      /**
+      *
+      * Note a Ticket
+      *
+      * @tested
+      */
       function addTicketNote(data) {
         var retVal = http.post('/helpdesk/tickets/' + getTicketId() + '/conversations/note.json', data)
-        Logger.log(retVal)
+        if (retVal) {
+          reloadTicket(getTicketId())
+          return true
+        }
+        
+        return false
       }
-  
+
+      
+      function getTicketPriority() { return ticketObj.helpdesk_ticket.priority }
+      function setTicketPriority(priority) {
+        var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
+          helpdesk_ticket: {
+            priority: priority
+          }
+        })
+        
+        if (retVal) {
+          reloadTicket(getTicketId())
+          return this
+        }
+        
+        throw Error('set priority fail')  
+      }
+
+      function getTicketStatus() { return ticketObj.helpdesk_ticket.status }      
+      function setTicketStatus(status) {
+        var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
+          helpdesk_ticket: {
+            status: status
+          }
+        })
+        
+        if (retVal) {
+          reloadTicket(getTicketId())
+          return this
+        }
+        
+        throw Error('set status fail')  
+      }
+      
+      function setTicketCustomField(customFields) {
+        var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
+          helpdesk_ticket: {
+            custom_field: customFields
+          }
+        })
+        
+        if (retVal) {
+          reloadTicket(getTicketId())
+          return this
+        }
+        
+        throw Error('set status fail')          
+      }
+      
+      function setTicketTag(tags) {
+        
+        throw Error('not implenment yet')
+        
+        var ticketTags = ticketObj.helpdesk_ticket.tags
+        
+//          "tags":[
+//         {"name": "tag1"},
+//         {"name": "tag2"}
+//    ]
+          
+        var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
+          helpdesk: {
+            tags: ticketTags
+          }
+        })
+        
+        if (retVal) {
+          reloadTicket(getTicketId())
+          return this
+        }
+        
+        throw Error('set tags fail')          
+      }
+
       ////////////////////////////////
     }// Seprator of Ticket Instance
     ////////////////////////////////
@@ -285,6 +378,8 @@ var Freshdesk = (function () {
       , makeMultipartArray: makeMultipartArray
       , makeMultipartBody: makeMultipartBody
       
+      , hasAttachment: hasAttachment
+      
     }
     
     function get(path) {
@@ -312,9 +407,7 @@ var Freshdesk = (function () {
       
       var contentType, payload
       
-      if (method=='post' 
-          && data && data.helpdesk_ticket 
-          && data.helpdesk_ticket.attachments) {
+      if (method=='post' && hasAttachment(data)) {
         
         var BOUNDARY = '-----CUTHEREelH7faHNSXWNi72OTh08zH29D28Zhr3Rif3oupOaDrj'
         var multipartArray = makeMultipartArray(data)
@@ -370,8 +463,8 @@ var Freshdesk = (function () {
           endpoint = URL + path
         }
       
-      log(log.DEBUG, endpoint)
-      log(log.DEBUG, JSON.stringify(options))
+//      log(log.DEBUG, endpoint)
+//      log(log.DEBUG, JSON.stringify(options))
       
       /**
       *
@@ -519,6 +612,30 @@ var Freshdesk = (function () {
         }
       }
       
+    }
+    
+    /**
+    *
+    * Walk through a object, return true if there has any key named "attachments"
+    * @tested
+    */
+    function hasAttachment(obj) {
+     
+      if ((typeof obj) != 'object') return false
+            
+      var hasAtt = false
+      
+      var keys = Object.keys(obj)
+
+      for (var i=0; i<keys.length; i++) {
+        var key = keys[i]
+        if (key == 'attachments' || hasAttachment(obj[key])) {
+          hasAtt = true
+          break
+        }
+      }
+      
+      return hasAtt
     }
     
     function isAttachment(v) {
