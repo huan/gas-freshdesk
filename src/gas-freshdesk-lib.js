@@ -1,11 +1,39 @@
 var Freshdesk = (function () {
   'use strict'
+  /**
+  *
+  * GasFreshdesk - Freshdesk API Class for Google Apps Script
+  *
+  * GasFreshdesk is a easy to use Freshdesk API Class for GAS(Google Apps Script)
+  * It provides a OO(Object-Oriented) way to use Freshdesk Ticket / Contacts, etc.
+  *
+  * Github - https://github.com/zixia/gas-freshdesk
+  *
+  * Example:
+  ```javascript
+  var MyFreshdesk = new Freshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
   
-  /******************************************
-  *
-  * Class Freshdesk
-  *
+  var ticket = new MyFreshdesk.Ticket({
+    helpdesk_ticket: {
+      description:'A description'
+      , subject: 'A subject'
+      , email: 'you@example.com'
+    }
+  })
+  
+  ticket.assign(9000658396)
+  ticket.addNote({
+    body: 'Hi tom, Still Angry'
+    , private: true
+  })
+  ticket.setPriority(2)
+  ticket.setStatus(2)
+  
+  ticket.del()
+  ticket.restore()
+  ```
   */
+  
   var Freshdesk = function (url, key) {
         
     if (!key || !url) throw Error('options error: key or url not exist!')
@@ -16,7 +44,7 @@ var Freshdesk = (function () {
     /**
     * validateAuth: try to listTickets
     * if url & key is not right
-    * exception will be throw
+    * exception will be thrown
     */
     freshdeskListTickets()
     
@@ -25,6 +53,7 @@ var Freshdesk = (function () {
     
     this.Ticket = freshdeskTicket
     this.Contact = freshdeskContact
+    this.Agent = freshdeskAgent
     
     this.listTickets = freshdeskListTickets
     this.listContacts = freshdeskListContacts
@@ -42,7 +71,7 @@ var Freshdesk = (function () {
     
     /**
     *
-    * Method Search Ticket
+    * 1. Method Search Ticket
     *
     * now only return the first one
     * TODO: implement search functions
@@ -56,7 +85,7 @@ var Freshdesk = (function () {
     
     /**
     *
-    * Method Search Contact
+    * 2. Method Search Contact
     *
     * now only return the first one
     * TODO: implement search fun7ctions
@@ -77,7 +106,7 @@ var Freshdesk = (function () {
     
     /**
     *
-    * Method Search Agent
+    * 3. Method Search Agent
     *
     * now only return the first one
     * TODO: implement search functions
@@ -101,7 +130,7 @@ var Freshdesk = (function () {
     /******************************************************************
     *
     * Class Ticket
-    *
+    * ------------
     */
     function freshdeskTicket (options) {
       
@@ -117,10 +146,7 @@ var Freshdesk = (function () {
         
         id = options
         
-        // load #id to ticketObj
         reloadTicket(id)
-//        Logger.log('outside reloadTicket')
-//        Logger.log(ticketObj)
 
       } else if ((typeof options) === 'object') { // { x: y } options
         
@@ -151,20 +177,13 @@ var Freshdesk = (function () {
       
       this.getRawObj = function () { return ticketObj }
       
-      // Update
-      //      this.setPriority = setTicketPriority
-      //      this.setStatus = setTicketStatus
       //      this.setCustomField = setTicketCustomField
       //      this.setTag = setTicketTag
       
       
-      // Delete
-      //      this.restore = restoreTicket
-      //
-      
-
       return this
 
+      ///////////////////////////////////////////////////////////
       
       function getTicketId() {
         if (ticketObj && ticketObj.helpdesk_ticket && ticketObj.helpdesk_ticket.display_id) {
@@ -175,7 +194,6 @@ var Freshdesk = (function () {
       }
       
       function getResponderId() {
-//        Logger.log(ticketObj.helpdesk_ticket.responder_id)
 
         if (ticketObj && ticketObj.helpdesk_ticket && ticketObj.helpdesk_ticket.responder_id) {
           return String(ticketObj.helpdesk_ticket.responder_id)
@@ -344,7 +362,7 @@ var Freshdesk = (function () {
     /***************************************************************************
     *
     * Class Contact
-    *
+    * -------------
     */
     function freshdeskContact(options) {
       
@@ -360,10 +378,7 @@ var Freshdesk = (function () {
         
         id = options
         
-        // load #id to contactObj
         reloadContact(id)
-//        Logger.log('outside reloadTicket')
-//        Logger.log(ticketObj)
 
       } else if ((typeof options) === 'object') { // { x: y } options
         
@@ -393,6 +408,7 @@ var Freshdesk = (function () {
       
       return this
 
+      ////////////////////////////////////////////////////////
       
       function getContactId() {
         if (contactObj && contactObj.user && contactObj.user.id) {
@@ -479,7 +495,7 @@ var Freshdesk = (function () {
     /***************************************************************************
     *
     * Class Agent
-    *
+    * -----------
     */
     function freshdeskAgent(id) {
       
@@ -561,8 +577,9 @@ var Freshdesk = (function () {
   
   /***********************************************************************
   *
-  * Http Backend Class for Freshdesk Rest API
-  * 
+  * Class Http 
+  * ----------
+  * Backend Class for Freshdesk Rest API
   *
   * options.key
   * options.type
@@ -673,9 +690,6 @@ var Freshdesk = (function () {
         } else {
           endpoint = URL + path
         }
-      
-//      log(log.DEBUG, endpoint)
-//      log(log.DEBUG, JSON.stringify(options))
       
       /**
       *

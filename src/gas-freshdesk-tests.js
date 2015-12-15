@@ -1,3 +1,36 @@
+/**
+*
+* GasFreshdesk - Freshdesk API Class for Google Apps Script
+*
+* GasFreshdesk is a easy to use Freshdesk API Class for GAS(Google Apps Script)
+* It provides a OO(Object-Oriented) way to use Freshdesk Ticket / Contacts, etc.
+*
+* Github - https://github.com/zixia/gas-freshdesk
+*
+* Example:
+```javascript
+var MyFreshdesk = new Freshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
+
+var ticket = new MyFreshdesk.Ticket({
+  helpdesk_ticket: {
+    description:'A description'
+    , subject: 'A subject'
+    , email: 'you@example.com'
+  }
+})
+
+ticket.assign(9000658396)
+ticket.addNote({
+  body: 'Hi tom, Still Angry'
+  , private: true
+})
+ticket.setPriority(2)
+ticket.setStatus(2)
+
+ticket.del()
+ticket.restore()
+```
+*/
 
 function freshdeskTestRunner() {
   'use strict'
@@ -18,9 +51,14 @@ function freshdeskTestRunner() {
   // key for agent 'zixia@zixia.net' at 'https://mikebo.freshdesk.com'
   var FRESHDESK_KEY = 'Jrg0FQNzX3tzuHbiFjYQ'         
 
+  /******************************************************************
+  *
   
 //  return development()
-  
+
+  *
+  */
+
   
   /******************************************************************
   *
@@ -287,7 +325,6 @@ function freshdeskTestRunner() {
       if (data && data.form) var tmp = data.form.test || ''
       t.equal(tmp, 'ok', 'http.post')
     })
-  }
-  
+  }  
 
 }
