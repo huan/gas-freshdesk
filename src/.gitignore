@@ -5,3 +5,4 @@ gast-tests.js
 debug.js
 gas-gmail-channel-lib.js
 gas-gmail-channel-tests.js
+polyfill.js
