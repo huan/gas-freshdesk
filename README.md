@@ -25,7 +25,7 @@ var ticket = new MyFreshdesk.Ticket({
 })
 
 ticket.assign(9000658396)
-ticket.addNote({
+ticket.note({
   body: 'Hi tom, Still Angry'
   , private: true
 })

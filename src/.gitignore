@@ -2,3 +2,6 @@ gasl-demo.js
 gas-log-lib.js
 gas-tap-lib.js
 gast-tests.js
+debug.js
+gas-gmail-channel-lib.js
+gas-gmail-channel-tests.js

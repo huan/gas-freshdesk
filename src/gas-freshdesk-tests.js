@@ -20,7 +20,7 @@ var ticket = new MyFreshdesk.Ticket({
 })
 
 ticket.assign(9000658396)
-ticket.addNote({
+ticket.note({
   body: 'Hi tom, Still Angry'
   , private: true
 })
@@ -181,7 +181,7 @@ function freshdeskTestRunner() {
       
       var numNotes = newTicket.getRawObj().helpdesk_ticket.notes.length
 
-      newTicket.addNote({
+      newTicket.note({
         helpdesk_note: {
           body: 'Hi tom, Still Angry'
           , private: true
@@ -192,7 +192,14 @@ function freshdeskTestRunner() {
         }
       })
       
-      t.equal(newTicket.getRawObj().helpdesk_ticket.notes.length, numNotes+1, 'new note created')
+      newTicket.note({
+        helpdesk_note: {
+          body: 'Hi tom, Still Angry'
+          , private: true
+        }
+      })
+      
+      t.equal(newTicket.getRawObj().helpdesk_ticket.notes.length, numNotes+2, 'new note created')
       
       
       var priority = newTicket.getPriority()

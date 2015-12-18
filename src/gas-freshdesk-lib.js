@@ -48,6 +48,8 @@ var Freshdesk = (function () {
     */
     freshdeskListTickets()
     
+    // in case of forget get rid of log in library.
+    if ((typeof log)==='undefined') eval('log = function () {}')
     
     this.http = http
     
@@ -164,7 +166,7 @@ var Freshdesk = (function () {
       this.getId = getTicketId
       this.getResponderId = getResponderId
       this.assign = assignTicket
-      this.addNote = addTicketNote
+      this.note = noteTicket
 
       this.del = deleteTicket
       this.restore = restoreTicket
@@ -175,6 +177,13 @@ var Freshdesk = (function () {
       this.getStatus = getTicketStatus
       this.setStatus = setTicketStatus
       
+      this.resolv = function () { return setTicketStatus(4) }
+      this.close = function () { return setTicketStatus(5) }
+      
+      this.lowPriority = function () { return setTicketPriority(1) }
+      this.mediumPriority = function () { return setTicketPriority(2) }
+      this.highPriority = function () { return setTicketPriority(3) }
+
       this.getRawObj = function () { return ticketObj }
       
       //      this.setCustomField = setTicketCustomField
@@ -262,7 +271,7 @@ var Freshdesk = (function () {
       *
       * @tested
       */
-      function addTicketNote(data) {
+      function noteTicket(data) {
         var retVal = http.post('/helpdesk/tickets/' + getTicketId() + '/conversations/note.json', data)
         if (retVal) {
           reloadTicket(getTicketId())
@@ -699,6 +708,8 @@ var Freshdesk = (function () {
       var response = UrlFetchApp.fetch(endpoint, options)
       
       if (response.getResponseCode() != 200 ) {
+        log('endpoint: ' + endpoint)
+        log('options: ' + JSON.stringify(options))
         log(log.ERR, response.getContentText().substring(0,1000))
         throw Error('http call failed with code:' + response.getResponseCode())
       }
