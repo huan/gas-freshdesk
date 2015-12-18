@@ -118,7 +118,7 @@ var Freshdesk = (function () {
       var email = options.email
       
       var data = http.get('/agents.json?state=all&query=email%20is%20' + email)
-//      Logger.log(JSON.stringify(data))
+//      log(JSON.stringify(data))
       if (data && data[0] && data[0].agent && data[0].agent.id) {
         var id = data[0].agent.id
         return new freshdeskAgent(id)
@@ -710,7 +710,7 @@ var Freshdesk = (function () {
       if (response.getResponseCode() != 200 ) {
         log('endpoint: ' + endpoint)
         log('options: ' + JSON.stringify(options))
-        log(log.ERR, response.getContentText().substring(0,1000))
+        log(response.getContentText().substring(0,1000))
         throw Error('http call failed with code:' + response.getResponseCode())
       }
       
