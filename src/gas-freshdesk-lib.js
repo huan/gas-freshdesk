@@ -33,6 +33,15 @@ var Freshdesk = (function () {
   ticket.restore()
   ```
   */
+
+  /**
+  * polyfill a dummy log function
+  * in case of forget get rid of log in library.
+  */
+  if ((typeof log)==='undefined') {
+//    Logger.log('log evaled in gas-freshdesk-lib')
+    eval('log = function () {}')
+  }
   
   var Freshdesk = function (url, key) {
         
@@ -48,8 +57,6 @@ var Freshdesk = (function () {
     */
     freshdeskListTickets()
     
-    // in case of forget get rid of log in library.
-    if ((typeof log)==='undefined') eval('log = function () {}')
     
     this.http = http
     
@@ -156,6 +163,7 @@ var Freshdesk = (function () {
         * 2. new ticket. create it.
         */
         
+        validateHelpdeskObject(options)
         ticketObj = http.post('/helpdesk/tickets.json', options)
         
       } else {
@@ -272,6 +280,9 @@ var Freshdesk = (function () {
       * @tested
       */
       function noteTicket(data) {
+        
+        validateHelpdeskObject(data)
+        
         var retVal = http.post('/helpdesk/tickets/' + getTicketId() + '/conversations/note.json', data)
         if (retVal) {
           reloadTicket(getTicketId())
@@ -573,7 +584,8 @@ var Freshdesk = (function () {
   
   // export for testing only
   Freshdesk.Http = Http
-  
+  Freshdesk.validateHelpdeskObject = validateHelpdeskObject
+  Freshdesk.validEmail = validateEmail
   
   return Freshdesk
   
@@ -649,6 +661,8 @@ var Freshdesk = (function () {
         var BOUNDARY = '-----CUTHEREelH7faHNSXWNi72OTh08zH29D28Zhr3Rif3oupOaDrj'
         var multipartArray = makeMultipartArray(data)
         
+//        log(JSON.stringify(multipartArray))
+            
         contentType = 'multipart/form-data; boundary=' + BOUNDARY
         payload = makeMultipartBody(multipartArray, BOUNDARY)
         
@@ -770,10 +784,20 @@ var Freshdesk = (function () {
       for (var i in multipartArray) {
         var [k, v] = multipartArray[i]
         
+//        log('multipartArray[' + k + ']')
+        
         if (v.toString() == 'Blob'
             || v.toString() == 'GmailAttachment' 
         ) {
           
+//          log(v.toString())
+//          log(v)
+//          log(typeof v)
+          
+//          Object.keys(v).forEach(function (k) {
+//            log('v[' + k + ']')
+//          })
+                                 
           // attachment
           body = body.concat(
             Utilities.newBlob(
@@ -882,6 +906,60 @@ var Freshdesk = (function () {
       return false
     }
     
+  }
+  
+  function validateEmail(email) {
+    var RE=/^[a-z0-9\-_.]+@[a-z0-9\-_.]+$/i
+    
+    if (RE.test(email)) return true
+    
+    throw Error('invalid email: [' + email + ']')
+  }
+  
+  function validateHelpdeskObject(obj) {
+    if (!obj || (typeof obj!=='object')) throw Error('invalid helpdesk object: it is not object.')
+    
+    var hasApi = false
+    var attachments
+
+    Object.keys(obj).forEach(function (api) {
+//      log('api: ' + api)
+      switch (api) {
+          
+        case 'helpdesk_ticket':
+          
+          var to = obj.helpdesk_ticket.to
+          if (to) validateEmail(to)
+          
+          if (obj.helpdesk_ticket.attachments) attachments = obj.helpdesk_ticket.attachments
+          
+          hasApi = true
+          break;
+          
+        case 'helpdesk_note':
+          
+          if (!obj.helpdesk_note.body) throw Error('invalid helpdesk note: no body found!')
+          
+          if (obj.helpdesk_note.attachments) attachments = obj.helpdesk_note.attachments
+          
+          hasApi = true
+          break;
+          
+        default:
+          break;
+      }
+    })
+    
+    if (attachments) {
+      if (!(attachments instanceof Array) || !(attachments[0].resource)) {
+        throw Error('invalid help desk object: attachment format error!')
+      }
+    }
+    
+    if (!hasApi) throw Error('invalid help desk object: no valid api params found!')
+    
+    // unknown treat as ok
+    return true
   }
   
 }())

@@ -1,39 +1,40 @@
-/**
-*
-* GasFreshdesk - Freshdesk API Class for Google Apps Script
-*
-* GasFreshdesk is a easy to use Freshdesk API Class for GAS(Google Apps Script)
-* It provides a OO(Object-Oriented) way to use Freshdesk Ticket / Contacts, etc.
-*
-* Github - https://github.com/zixia/gas-freshdesk
-*
-* Example:
-```javascript
-var MyFreshdesk = new Freshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
-
-var ticket = new MyFreshdesk.Ticket({
-  helpdesk_ticket: {
-    description:'A description'
-    , subject: 'A subject'
-    , email: 'you@example.com'
-  }
-})
-
-ticket.assign(9000658396)
-ticket.note({
-  body: 'Hi tom, Still Angry'
-  , private: true
-})
-ticket.setPriority(2)
-ticket.setStatus(2)
-
-ticket.del()
-ticket.restore()
-```
-*/
-
 function freshdeskTestRunner() {
   'use strict'
+  
+  /**
+  *
+  * GasFreshdesk - Freshdesk API Class for Google Apps Script
+  *
+  * GasFreshdesk is a easy to use Freshdesk API Class for GAS(Google Apps Script)
+  * It provides a OO(Object-Oriented) way to use Freshdesk Ticket / Contacts, etc.
+  *
+  * Github - https://github.com/zixia/gas-freshdesk
+  *
+  * Example:
+  ```javascript
+  var MyFreshdesk = new Freshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
+  
+  var ticket = new MyFreshdesk.Ticket({
+    helpdesk_ticket: {
+    description:'A description'
+      , subject: 'A subject'
+      , email: 'you@example.com'
+    }
+  })
+  
+  ticket.assign(9000658396)
+  ticket.note({
+    body: 'Hi tom, Still Angry'
+    , private: true
+  })
+  ticket.setPriority(2)
+  ticket.setStatus(2)
+  
+  ticket.del()
+  ticket.restore()
+  ```
+  */  
+  
   
   if ((typeof GasLog)==='undefined') { // GasL Initialization. (only if not initialized yet.)
     eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gasl/master/src/gas-log-lib.js').getContentText())
@@ -68,6 +69,8 @@ function freshdeskTestRunner() {
 
   testHttpBackend()
   testUtils()
+
+  testValidators()
   
   testFreshdeskAuth()
 
@@ -116,6 +119,73 @@ function freshdeskTestRunner() {
       t.ok(contact.getId(), 'contact has id')
     })
     
+  }
+  
+  function testValidators() {
+    
+    test ('Validate Ticket Object', function (t) {
+      
+      var OK_TICKET_OBJ = {
+        helpdesk_ticket: {
+          to: 'email@email.com'
+        }
+      }
+      
+      var NOT_OK_TICKET_OBJ = {
+        test: {
+          to: 'email@email.com'
+        }
+      }
+      
+      var OK_TICKET_WITH_ATT_OBJ = {
+        helpdesk_ticket: {
+          to: 'email@email.com'
+          , attachments: [
+            { resource: 'blob' }
+          ]
+        }
+      }
+
+      var NOT_OK_TICKET_WITH_ATT_OBJ1 = {
+        helpdesk_ticket: {
+          to: 'email@email.com'
+          , attachments: [
+            { errkey: 'blob' }
+          ]
+        }
+      }
+      
+      var NOT_OK_TICKET_WITH_ATT_OBJ2 = {
+        helpdesk_ticket: {
+          to: 'email@email.com'
+          , attachments: 
+            { resource: 'blob, not array' }
+          
+        }
+      }
+
+     var OK_TICKET_EMAIL_OBJ = {
+        helpdesk_ticket: {
+          to: 'test_.-email@email_em-ail.co.jp'
+        }
+      }
+
+     var NOT_OK_TICKET_EMAIL_OBJ = {
+        helpdesk_ticket: {
+          to: ' test_.-email@email_em-ail.co.jp'
+        }
+      }
+
+     t.notThrow(function () { Freshdesk.validateHelpdeskObject(OK_TICKET_OBJ) }, 'ticket obj with right key')
+     t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_OBJ) }, 'ticket obj with wrong key')
+     
+     t.notThrow(function () { Freshdesk.validateHelpdeskObject(OK_TICKET_WITH_ATT_OBJ) }, 'ticket obj with right attachment')
+     t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_WITH_ATT_OBJ1) }, 'ticket obj with wrong key of attachment')
+     t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_WITH_ATT_OBJ2) }, 'ticket obj with wrong array of attachment')
+     
+     t.notThrow(function () { Freshdesk.validateHelpdeskObject(OK_TICKET_EMAIL_OBJ) }, 'ticket obj with right email')
+     t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_EMAIL_OBJ) }, 'ticket obj with wrong email')
+    })
   }
   
   function testUtils() {
