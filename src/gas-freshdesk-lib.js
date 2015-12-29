@@ -1005,7 +1005,7 @@ var Freshdesk = (function () {
           
         case 'helpdesk_note':
           
-          if (!obj.helpdesk_note.body) throw Error('invalid helpdesk note: no body found!')
+          if (!obj.helpdesk_note.body && !obj.helpdesk_note.body_html) throw Error('invalid helpdesk note: no body found!')
           
           if (obj.helpdesk_note.attachments) attachments = obj.helpdesk_note.attachments
           
