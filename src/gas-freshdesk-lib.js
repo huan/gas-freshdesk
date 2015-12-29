@@ -211,6 +211,8 @@ var Freshdesk = (function () {
       this.getStatus = getTicketStatus
       this.setStatus = setTicketStatus
       
+      this.open = function () { return setTicketStatus(2) }
+      this.pend = function () { return setTicketStatus(3) }
       this.resolv = function () { return setTicketStatus(4) }
       this.close = function () { return setTicketStatus(5) }
       

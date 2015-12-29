@@ -112,6 +112,16 @@ ticket.del()
 
 #### 2.4 `Ticket.list()`: List tickets
 
+#### 2.5 `Ticket.setStatus()`
+
+Set ticket to status with parameter.
+
+Has the following shortcut methods:
+
+1. `open()`
+1. `pend()`
+1. `resolv()`
+1. `close()`
 
 ### 3. Class `Contact`
 
