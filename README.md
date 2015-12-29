@@ -110,6 +110,9 @@ var ticket = new MyFreshdesk.Ticket(1)
 ticket.del()
 ```
 
+#### 2.4 `Ticket.list()`: List tickets
+
+
 ### 3. Class `Contact`
 
 ```javascript
@@ -119,13 +122,14 @@ var contact = new MyFreshdesk.Contact(requesterId)
 Logger.log(contact.getEmail())
 ```
 
-#### 3.1 TBW
+#### 3.1 `Contact.list()`: List contacts
+
 
 ### 4. Class `Agent`
 
 TBW
 
-#### 4.1 TBW
+#### 4.1 `Agent.list()`: List agents
 
 ## Test Suites
 

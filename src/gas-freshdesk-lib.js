@@ -65,8 +65,13 @@ var Freshdesk = (function () {
     this.Agent = freshdeskAgent
     
     this.listTickets = freshdeskListTickets
+    this.Ticket.list = freshdeskListTickets
+    
     this.listContacts = freshdeskListContacts
+    this.Contact.list = freshdeskListContacts
+    
     this.listAgents = freshdeskListAgents
+    this.Agent.list = freshdeskListAgents
     
     return this
     
