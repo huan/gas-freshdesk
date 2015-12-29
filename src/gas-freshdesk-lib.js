@@ -55,7 +55,7 @@ var Freshdesk = (function () {
     * if url & key is not right
     * exception will be thrown
     */
-    freshdeskListTickets()
+    validateAuth()
     
     
     this.http = http
@@ -82,6 +82,15 @@ var Freshdesk = (function () {
     *
     */
     
+    
+    /**
+    *
+    * make a http call to api, in order to confirm the auth token is right.
+    *
+    */
+    function validateAuth() {
+      return http.get('/helpdesk/tickets/filter/all_tickets?format=json')
+    }
     
     /**
     *
@@ -995,8 +1004,7 @@ var Freshdesk = (function () {
           
         case 'helpdesk_ticket':
           
-          var to = obj.helpdesk_ticket.to
-          if (to) validateEmail(to)
+          var to = validateEmail(obj.helpdesk_ticket.to)
           
           if (obj.helpdesk_ticket.attachments) attachments = obj.helpdesk_ticket.attachments
           

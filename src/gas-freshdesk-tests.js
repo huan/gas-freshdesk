@@ -55,7 +55,7 @@ function freshdeskTestRunner() {
   /******************************************************************
   */
   
-//  return development()
+  return development()
 
   /*
   *******************************************************************/
@@ -85,7 +85,10 @@ function freshdeskTestRunner() {
   ////////////////////////////////////////////////////////////////////////  
   
   function development() {
-  testSearch()
+    var MyFreshdesk =  new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
+    var t = new MyFreshdesk.Ticket(105)
+    
+    Logger.log(JSON.stringify(t.getRawObj()))
   }
   
   function testSearch() {
