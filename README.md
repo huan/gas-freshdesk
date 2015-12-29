@@ -67,6 +67,15 @@ var MyFreshdesk = new Freshdesk(
 )
 ```
 
+#### 1.2 `MyFreshdesk.listTickets(options)`
+
+List or search for tickets. Return a array of Tickets instance.
+
+`options`:
+* `email`: email address of requester
+
+if `options` is not provided, then listTickets will uses the new_and_my_open filter.
+
 ### 2. Class `Ticket`
 
 #### 2.1 `MyFreshdesk.Ticket({...})`: Class constructor for Ticket
@@ -103,7 +112,12 @@ ticket.del()
 
 ### 3. Class `Contact`
 
-TBW
+```javascript
+var requesterId = Ticket.getRequesterId()
+var contact = new MyFreshdesk.Contact(requesterId)
+
+Logger.log(contact.getEmail())
+```
 
 #### 3.1 TBW
 

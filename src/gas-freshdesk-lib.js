@@ -35,12 +35,12 @@ var Freshdesk = (function () {
   */
 
   /**
-  * polyfill a dummy log function
-  * in case of forget get rid of log in library.
+  * PolyFill a dummy log function
+  * in case of forget get rid of log in library(as developing/debuging)
   */
   if ((typeof log)==='undefined') {
 //    Logger.log('log evaled in gas-freshdesk-lib')
-    eval('log = function () {}')
+    eval('var log = function () {}')
   }
   
   var Freshdesk = function (url, key) {
@@ -82,13 +82,33 @@ var Freshdesk = (function () {
     *
     * 1. Method Search Ticket
     *
-    * now only return the first one
-    * TODO: implement search functions
+    * @return array of Tickets of search. null for not found
+    * 
+    * @param array options
+    *   email: email address of requester
+    *
+    * @document https://freshdesk.com/api#view_all_ticket
+    *
     */
     function freshdeskListTickets(options) {
-      var data = http.get('/helpdesk/tickets/filter/all_tickets?format=json')
       
-      return data
+      var data
+      
+      if (options && options.email) { // Requester email
+        var email = validateEmail(options.email)
+        data = http.get('/helpdesk/tickets.json?email=' + email + '&filter_name=all_tickets')
+        
+      } else { // Uses the new_and_my_open filter.
+        data = http.get('/helpdesk/tickets/filter/all_tickets?format=json')
+        
+      }
+      
+      if (!data || !data.length) return null
+      
+      var tickets = data.map(function (d) { return d.display_id })
+      .map(function (i) { return new freshdeskTicket(i) })
+      
+      return tickets
     }
     
     
@@ -173,6 +193,7 @@ var Freshdesk = (function () {
       
       this.getId = getTicketId
       this.getResponderId = getResponderId
+      this.getRequesterId = getRequesterId
       this.assign = assignTicket
       this.note = noteTicket
 
@@ -204,7 +225,7 @@ var Freshdesk = (function () {
       
       function getTicketId() {
         if (ticketObj && ticketObj.helpdesk_ticket && ticketObj.helpdesk_ticket.display_id) {
-          return Math.floor(ticketObj.helpdesk_ticket.display_id)
+          return ticketObj.helpdesk_ticket.display_id
         }
         
         return null
@@ -213,12 +234,21 @@ var Freshdesk = (function () {
       function getResponderId() {
 
         if (ticketObj && ticketObj.helpdesk_ticket && ticketObj.helpdesk_ticket.responder_id) {
-          return String(ticketObj.helpdesk_ticket.responder_id)
+          return ticketObj.helpdesk_ticket.responder_id
         }
         
         return null
       }
-      
+
+      function getRequesterId() {
+
+        if (ticketObj && ticketObj.helpdesk_ticket && ticketObj.helpdesk_ticket.requester_id) {
+          return ticketObj.helpdesk_ticket.requester_id
+        }
+        
+        return null
+      }
+            
       function assignTicket(responderId) {
         
         http.put('/helpdesk/tickets/' 
@@ -267,7 +297,7 @@ var Freshdesk = (function () {
       function reloadTicket(id) {
         
         if (id%1 !== 0) throw Error('ticket id(' + id + ') must be integer.')
-        
+//      log(log.DEBUG, 'loading id:%s', id)
         ticketObj = http.get('/helpdesk/tickets/' + id + '.json')
         
         return this
@@ -420,6 +450,8 @@ var Freshdesk = (function () {
       this.getName = getContactName
       this.setName = setContactName
       
+      this.getEmail = getContactEmail
+      
       this.getTitle = getContactTitle
       this.setTitle = setContactTitle
       
@@ -485,6 +517,10 @@ var Freshdesk = (function () {
         throw Error('set name fail')  
       }
 
+      function getContactEmail() {
+        return contactObj.user.email
+      }
+      
       /**
       *
       *
@@ -719,27 +755,44 @@ var Freshdesk = (function () {
       * UrlFetch fetch API EndPoint
       *
       */
-      var response = UrlFetchApp.fetch(endpoint, options)
       
-      if (response.getResponseCode() != 200 ) {
+      var TTL = 3
+      var response = undefined
+      var retCode = undefined
+
+      while (!retCode && TTL--) {
+        try {
+          response = UrlFetchApp.fetch(endpoint, options)
+          retCode = response.getResponseCode()
+        } catch (e) {
+          log(log.ERR, 'UrlFetchApp.fetch exception: %s, %s', e.name, e.message)
+//          Logger.log('UrlFetchApp.fetch exception: ' + e.toString())
+        }
+//        Logger.log('ttl:' + TTL + ', retCode:' + retCode)
+      }
+      
+      if (retCode != 200 ) {
         log('endpoint: ' + endpoint)
         log('options: ' + JSON.stringify(options))
         log(response.getContentText().substring(0,1000))
         throw Error('http call failed with code:' + response.getResponseCode())
       }
       
-      var ret = response.getContentText()
+      var retContent = response.getContentText()
       
       /**
       * Object in object out
       * String in string out
       */
+      var retObj
+      
       switch (true) {
         case /x-www-form-urlencoded/.test(contentType):
           try {
-            ret = JSON.parse(ret)
+            retObj = JSON.parse(retContent)
           } catch (e) {
             // it's ok here, just let ret be string.
+            retObj = retContent
           }
           
           break;
@@ -748,23 +801,24 @@ var Freshdesk = (function () {
         case /multipart/.test(contentType):
         case /json/.test(contentType):
           try {
-            ret = JSON.parse(ret)
+            retObj = JSON.parse(retContent)
           } catch (e) {
             /**
             * something went wrong here! 
             * because we need: Object in object out
             */
-            ret = {
+            retObj = {
               error: e.message
-              , string: ret
+              , string: retContent
             }
           }
           break
       }
       
-      if (ret && ret.require_login) throw Error('auth failed to url ' + URL + ' with key ' + KEY)
+      // Freshdesk API will set `require_login` if login failed
+      if (retObj && retObj.require_login) throw Error('auth failed to url ' + URL + ' with key ' + KEY)
       
-      return ret
+      return retObj
       
     }  
     
@@ -908,10 +962,16 @@ var Freshdesk = (function () {
     
   }
   
+  /**
+  *
+  * return email if valid
+  * throw exception if NOT valid
+  *
+  */
   function validateEmail(email) {
     var RE=/^[a-z0-9\-_.]+@[a-z0-9\-_.]+$/i
     
-    if (RE.test(email)) return true
+    if (RE.test(email)) return email
     
     throw Error('invalid email: [' + email + ']')
   }
@@ -951,8 +1011,8 @@ var Freshdesk = (function () {
     })
     
     if (attachments) {
-      if (!(attachments instanceof Array) || !(attachments[0].resource)) {
-        throw Error('invalid help desk object: attachment format error!')
+      if (!(attachments instanceof Array) || !attachments.length || !(attachments[0].resource)) {
+        throw Error('invalid help desk object: attachment format error! attachments: ' + attachments)
       }
     }
     

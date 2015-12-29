@@ -53,12 +53,12 @@ function freshdeskTestRunner() {
   var FRESHDESK_KEY = 'Jrg0FQNzX3tzuHbiFjYQ'         
 
   /******************************************************************
-  *
+  */
   
 //  return development()
 
-  *
-  */
+  /*
+  *******************************************************************/
 
   
   /******************************************************************
@@ -78,11 +78,31 @@ function freshdeskTestRunner() {
   testFreshdeskContact()
   testFreshdeskAgent()
 
+  testSearch()
+  
   test.finish()
   
   ////////////////////////////////////////////////////////////////////////  
   
   function development() {
+  testSearch()
+  }
+  
+  function testSearch() {
+    var MyFreshdesk =  new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
+    
+    test('listTickets', function (t) {
+      var EMAIL = 'you@example.com'
+      tickets = MyFreshdesk.listTickets({ email: EMAIL })
+    
+      t.ok(tickets.length, 'get listTickets result')
+      t.ok(tickets[0].getId(), 'ticket id valid')
+      
+      var contactId = tickets[0].getRequesterId()
+      var contact = new MyFreshdesk.Contact(contactId)
+      
+      t.equal(contact.getEmail(), EMAIL, 'email match')
+    })
   }
   
   function testFreshdeskAgent() {
