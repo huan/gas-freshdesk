@@ -1004,7 +1004,7 @@ var Freshdesk = (function () {
           
         case 'helpdesk_ticket':
           
-          var to = validateEmail(obj.helpdesk_ticket.to)
+          validateEmail(obj.helpdesk_ticket.email) // will throw exception if not valid
           
           if (obj.helpdesk_ticket.attachments) attachments = obj.helpdesk_ticket.attachments
           
