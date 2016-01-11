@@ -55,7 +55,7 @@ function freshdeskTestRunner() {
   /******************************************************************
   */
   
-  return development()
+//  return development()
 
   /*
   *******************************************************************/
@@ -150,19 +150,19 @@ function freshdeskTestRunner() {
       
       var OK_TICKET_OBJ = {
         helpdesk_ticket: {
-          to: 'email@email.com'
+          email: 'email@email.com'
         }
       }
       
       var NOT_OK_TICKET_OBJ = {
         test: {
-          to: 'email@email.com'
+          email: 'email@email.com'
         }
       }
       
       var OK_TICKET_WITH_ATT_OBJ = {
         helpdesk_ticket: {
-          to: 'email@email.com'
+          email: 'email@email.com'
           , attachments: [
             { resource: 'blob' }
           ]
@@ -171,7 +171,7 @@ function freshdeskTestRunner() {
 
       var NOT_OK_TICKET_WITH_ATT_OBJ1 = {
         helpdesk_ticket: {
-          to: 'email@email.com'
+          email: 'email@email.com'
           , attachments: [
             { errkey: 'blob' }
           ]
@@ -180,7 +180,7 @@ function freshdeskTestRunner() {
       
       var NOT_OK_TICKET_WITH_ATT_OBJ2 = {
         helpdesk_ticket: {
-          to: 'email@email.com'
+          email: 'email@email.com'
           , attachments: 
             { resource: 'blob, not array' }
           
@@ -189,13 +189,13 @@ function freshdeskTestRunner() {
 
      var OK_TICKET_EMAIL_OBJ = {
         helpdesk_ticket: {
-          to: 'test_.-email@email_em-ail.co.jp'
+          email: 'test_.-email@email_em-ail.co.jp'
         }
       }
 
      var NOT_OK_TICKET_EMAIL_OBJ = {
         helpdesk_ticket: {
-          to: ' test_.-email@email_em-ail.co.jp'
+          email: 'n@t a valid address'
         }
       }
 
@@ -206,8 +206,8 @@ function freshdeskTestRunner() {
      t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_WITH_ATT_OBJ1) }, 'ticket obj with wrong key of attachment')
      t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_WITH_ATT_OBJ2) }, 'ticket obj with wrong array of attachment')
      
-     t.notThrow(function () { Freshdesk.validateHelpdeskObject(OK_TICKET_EMAIL_OBJ) }, 'ticket obj with right email')
-     t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_EMAIL_OBJ) }, 'ticket obj with wrong email')
+     t.notThrow(function () { Freshdesk.validateHelpdeskObject(OK_TICKET_EMAIL_OBJ) }, 'ticket obj with valid email address')
+     t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_EMAIL_OBJ) }, 'ticket obj with invalid email address')
     })
   }
   

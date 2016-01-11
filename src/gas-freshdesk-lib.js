@@ -34,14 +34,18 @@ var Freshdesk = (function () {
   ```
   */
 
+  
   /**
+  *
   * PolyFill a dummy log function
-  * in case of forget get rid of log in library(as developing/debuging)
+  * in case of forget get rid of log in library(as developing/debuging)\
+  *
   */
   if ((typeof log)==='undefined') {
-//    Logger.log('log evaled in gas-freshdesk-lib')
+    Logger.log('PolyFill log: evaled in gas-freshdesk-lib')
     eval('var log = function () {}')
   }
+  
   
   var Freshdesk = function (url, key) {
         
@@ -781,8 +785,8 @@ var Freshdesk = (function () {
           response = UrlFetchApp.fetch(endpoint, options)
           retCode = response.getResponseCode()
         } catch (e) {
-          log(log.ERR, 'UrlFetchApp.fetch exception: %s, %s', e.name, e.message)
-//          Logger.log('UrlFetchApp.fetch exception: ' + e.toString())
+          log(log.ERR, 'UrlFetchApp.fetch exception(ttl:%s): %s, %s', TTL, e.name, e.message)
+          Utilities.sleep(50) // sleep 50 ms
         }
 //        Logger.log('ttl:' + TTL + ', retCode:' + retCode)
       }
@@ -985,7 +989,7 @@ var Freshdesk = (function () {
   *
   */
   function validateEmail(email) {
-    var RE=/<?[a-z0-9\-_.]+@[a-z0-9\-_.]+>?$/i
+    var RE=/<?[a-z0-9\-_.]+@[a-z0-9\-_]+\.[a-z0-9\-_.]+>?$/i
     
     if (RE.test(email)) return email
     
