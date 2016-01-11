@@ -163,7 +163,11 @@ For real-world examples from open-source projects using GasL, see Projects Using
 
 ## Version history
 
-### v0.2.0 (January 11, 2016)
+### v0.3.0(...): Freshdesk API V2
+* Switch to freshdesk api v2
+* new method added: Ticket.reply() 
+
+### v0.2.0(January 11, 2016): Freshdesk API v1
 * Add new methods
 * Last version with Freshdesk API v1
 
@@ -174,7 +178,7 @@ if ((typeof Freshdesk)==='undefined') { // GasFreshdesk Initialization. (only if
 } // Class Freshdesk is ready for use now!
 ```
 
-### v0.1.0 (December 16, 2015)
+### v0.1.0(December 16, 2015)
 * Initial public release.
 
 -------------------------------------------
