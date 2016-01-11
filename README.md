@@ -163,6 +163,17 @@ For real-world examples from open-source projects using GasL, see Projects Using
 
 ## Version history
 
+### v0.2.0 (January 11, 2016)
+* Add new methods
+* Last version with Freshdesk API v1
+
+To use the v0.2.0 gas-freshdesk library with freshdesk api v1, put the following snip in your gas code.
+```javascript
+if ((typeof Freshdesk)==='undefined') { // GasFreshdesk Initialization. (only if not initialized yet.)
+  eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gas-freshdesk/v0.2.0/src/gas-freshdesk-lib.js').getContentText())
+} // Class Freshdesk is ready for use now!
+```
+
 ### v0.1.0 (December 16, 2015)
 * Initial public release.
 
