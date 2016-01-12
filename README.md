@@ -29,6 +29,10 @@ ticket.note({
   body: 'Hi tom, Still Angry'
   , private: true
 })
+ticket.reply({
+  body: 'Hi tom, Still Angry'
+  , cc_emails: 'you@example.com' 
+})
 ticket.setPriority(2)
 ticket.setStatus(2)
 
@@ -52,6 +56,10 @@ if ((typeof Freshdesk)==='undefined') { // GasFreshdesk Initialization. (only if
 ```
 
 ## API
+
+Gas Freshdesk Library use [API v2](http://developer.freshdesk.com/api/) to communicate with freshdesk.
+
+The old version use Freshdesk API v1 is [Gas Freshdesk Library v0.2.0](v0.2.0).
 
 ### 1. Class `Freshdesk`
 
@@ -123,6 +131,27 @@ Has the following shortcut methods:
 1. `resolv()`
 1. `close()`
 
+#### 2.6 `Ticket.note()`
+
+Note a ticket.
+
+```javascript
+ticket.note({
+  body: 'Hi tom, Still Angry'
+  , private: true
+})
+```
+
+#### 2.7 `Ticket.reply()`
+
+Reply a ticket.
+
+```javascript
+ticket.reply({
+  body: 'Hi tom, Still Angry'
+  , cc_emails: 'you@example.com' 
+})
+```
 ### 3. Class `Contact`
 
 ```javascript
@@ -167,7 +196,7 @@ For real-world examples from open-source projects using GasL, see Projects Using
 * Switch to freshdesk api v2
 * new method added: Ticket.reply() 
 
-### v0.2.0(January 11, 2016): Freshdesk API v1
+### v0.2.0(January 11, 2016): Freshdesk API v1<a name="v0.2.0"></a>
 * Add new methods
 * Last version with Freshdesk API v1
 
