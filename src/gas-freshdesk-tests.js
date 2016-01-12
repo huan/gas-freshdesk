@@ -1,3 +1,7 @@
+//  if ((typeof GasLog)==='undefined') { // GasL Initialization. (only if not initialized yet.)
+//    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gasl/master/src/gas-log-lib.js').getContentText())
+//  } // Class GasLog is ready for use now!
+//  var log = new GasLog()
   
 function freshdeskTestRunner() {
   'use strict'
@@ -47,7 +51,8 @@ function freshdeskTestRunner() {
   // This is my test account, don't worry, thanks. ;]
   var FRESHDESK_URL = 'https://mikebo.freshdesk.com' 
   
-  // key for agent 'zixia@zixia.net' at 'https://mikebo.freshdesk.com'
+  // Sorry for this maybe make some people(hope not include you) who hate show plain text secret(key/password) in code.
+  // This is the key for agent 'zixia@zixia.net' at 'https://mikebo.freshdesk.com', just for easy testing...
   var FRESHDESK_KEY = 'Jrg0FQNzX3tzuHbiFjYQ'         
 
   /******************************************************************
@@ -83,28 +88,7 @@ function freshdeskTestRunner() {
   ////////////////////////////////////////////////////////////////////////  
   
   function development() {
-    var MyFreshdesk =  new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
-    var newTicket = new MyFreshdesk.Ticket(105)
-      
-    Logger.log(JSON.stringify(newTicket.getRawObj()))
-    
-    return
-    
-    newTicket.note({
-      body: 'Hi tom, Still Angry'
-      , private: true
-      , attachments: [ 
-        Utilities.newBlob('TEST DATA').setName('test-data.dat')
-        , Utilities.newBlob('TEST DATA2').setName('test-data2.dat')
-      ]
-    })
-    Logger.log(JSON.stringify(newTicket.getRawObj()))
-    
-    newTicket.note({
-      body: 'Hi tom, Still Angry'
-      , private: true
-    })
-    Logger.log(JSON.stringify(newTicket.getRawObj()))
+
   }
   
 
@@ -266,9 +250,19 @@ function freshdeskTestRunner() {
         body: 'Hi tom, Still Angry'
         , private: true
       })
+
+      // reply also in notes[]
+      newTicket.reply({ 
+        body: 'Replied: Hi tom, Still Angry'
+//        , user_id:　MIKE_RESPONDER_ID
+//        , cc_emails: 
+      })
       
       var newNumNotes = newTicket.getRawObj().notes ? newTicket.getRawObj().notes.length : 0
-      t.equal(newNumNotes, numNotes+2, 'new note created')
+      t.equal(newNumNotes, numNotes+3, 'new note(2) and reply(1) created')
+     
+
+      
       
       var priority = newTicket.getPriority()
       newTicket.setPriority(priority+1)
@@ -298,6 +292,7 @@ function freshdeskTestRunner() {
       t.ok(newTicketWithAttachment.del(), 'delete newTicketWithAttachment')
 
     })
+   
   }
   
   function testFreshdeskAuth() {

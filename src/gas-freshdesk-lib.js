@@ -33,19 +33,21 @@ var Freshdesk = (function () {
   */
   
   
+  /**
+  *
+  * Polyfill a dummy log function
+  * in case of forget get rid of log in library(as developing/debuging)\
+  *
+  */
+  try {
+    'use strict'
+    var throwExceptionIfRightVariableNotExist = log;
+  } catch (e) { // not exist
+//    Logger.log('Polyfill log: evaled in gas-freshdesk-lib')
+    eval('var log = function () {}')
+  }
+
   var Freshdesk = function (url, key) {
-    
-    /**
-    *
-    * Polyfill a dummy log function
-    * in case of forget get rid of log in library(as developing/debuging)\
-    *
-    */
-    if ((typeof log)==='undefined') {
-      Logger.log('Polyfill log: evaled in gas-freshdesk-lib')
-      eval('var log = function () {}')
-    }
-    
     
     if (!key || !url) throw Error('options error: key or url not exist!')
     
@@ -221,6 +223,7 @@ var Freshdesk = (function () {
       this.getRequesterId = getRequesterId
       this.assign = assignTicket
       this.note = noteTicket
+      this.reply = replyTicket
 
       this.del = deleteTicket
       this.restore = restoreTicket
@@ -355,6 +358,25 @@ var Freshdesk = (function () {
         return false
       }
 
+      /**
+      *
+      * Reply a Ticket
+      *
+      * @testing
+      */
+      function replyTicket(data) {
+        
+        validateHelpdeskObject(data)
+        
+        var retVal = http.post('/api/v2/tickets/' + getTicketId() + '/reply', data)
+        
+        if (retVal) {
+          reloadTicket(getTicketId())
+          return true
+        }
+        
+        return false
+      }
       
       /**
       *
@@ -800,16 +822,16 @@ var Freshdesk = (function () {
           response = UrlFetchApp.fetch(endpoint, options)
           retCode = response.getResponseCode()
         } catch (e) {
-          log(log.ERR, 'UrlFetchApp.fetch exception(ttl:%s): %s, %s', TTL, e.name, e.message)
+          log(log.DEBUG, 'UrlFetchApp.fetch exception(ttl:%s): %s, %s', TTL, e.name, e.message)
           Utilities.sleep(50) // sleep 50 ms
         }
 //        Logger.log('ttl:' + TTL + ', retCode:' + retCode)
       }
       
       if (!/^2/.test(retCode) ) { // not 2XX means error
-        log('endpoint: ' + endpoint)
-        log('options: ' + JSON.stringify(options))
-        log(response.getContentText().substring(0,1000))
+        log(log.DEBUG, 'endpoint: ' + endpoint)
+        log(log.DEBUG, 'options: ' + JSON.stringify(options))
+        log(log.DEBUG, response.getContentText().substring(0,1000))
         throw Error('http call failed with code:' + response.getResponseCode())
       }
       
