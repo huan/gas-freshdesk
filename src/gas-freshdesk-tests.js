@@ -1,3 +1,4 @@
+  
 function freshdeskTestRunner() {
   'use strict'
   
@@ -15,11 +16,9 @@ function freshdeskTestRunner() {
   var MyFreshdesk = new Freshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
   
   var ticket = new MyFreshdesk.Ticket({
-    helpdesk_ticket: {
     description:'A description'
-      , subject: 'A subject'
-      , email: 'you@example.com'
-    }
+    , subject: 'A subject'
+    , email: 'you@example.com'
   })
   
   ticket.assign(9000658396)
@@ -35,12 +34,11 @@ function freshdeskTestRunner() {
   ```
   */  
   
-  
   if ((typeof GasLog)==='undefined') { // GasL Initialization. (only if not initialized yet.)
     eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gasl/master/src/gas-log-lib.js').getContentText())
   } // Class GasLog is ready for use now!
   var log = new GasLog()
-  
+    
   if ((typeof GasTap)==='undefined') { // GasT Initialization. (only if not initialized yet.)
     eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gast/master/src/gas-tap-lib.js').getContentText())
   } // Class GasTap is ready for use now!
@@ -86,11 +84,30 @@ function freshdeskTestRunner() {
   
   function development() {
     var MyFreshdesk =  new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
-    var t = new MyFreshdesk.Ticket(105)
+    var newTicket = new MyFreshdesk.Ticket(105)
+      
+    Logger.log(JSON.stringify(newTicket.getRawObj()))
     
-    Logger.log(JSON.stringify(t.getRawObj()))
+    return
+    
+    newTicket.note({
+      body: 'Hi tom, Still Angry'
+      , private: true
+      , attachments: [ 
+        Utilities.newBlob('TEST DATA').setName('test-data.dat')
+        , Utilities.newBlob('TEST DATA2').setName('test-data2.dat')
+      ]
+    })
+    Logger.log(JSON.stringify(newTicket.getRawObj()))
+    
+    newTicket.note({
+      body: 'Hi tom, Still Angry'
+      , private: true
+    })
+    Logger.log(JSON.stringify(newTicket.getRawObj()))
   }
   
+
   function testSearch() {
     var MyFreshdesk =  new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
     
@@ -149,63 +166,26 @@ function freshdeskTestRunner() {
     test ('Validate Ticket Object', function (t) {
       
       var OK_TICKET_OBJ = {
-        helpdesk_ticket: {
-          email: 'email@email.com'
-        }
+        email: 'email@email.com'
       }
-      
-      var NOT_OK_TICKET_OBJ = {
-        test: {
-          email: 'email@email.com'
-        }
-      }
-      
+           
       var OK_TICKET_WITH_ATT_OBJ = {
-        helpdesk_ticket: {
-          email: 'email@email.com'
-          , attachments: [
-            { resource: 'blob' }
-          ]
-        }
-      }
-
-      var NOT_OK_TICKET_WITH_ATT_OBJ1 = {
-        helpdesk_ticket: {
-          email: 'email@email.com'
-          , attachments: [
-            { errkey: 'blob' }
-          ]
-        }
-      }
-      
-      var NOT_OK_TICKET_WITH_ATT_OBJ2 = {
-        helpdesk_ticket: {
-          email: 'email@email.com'
-          , attachments: 
-            { resource: 'blob, not array' }
-          
-        }
+        email: 'email@email.com'
+        , attachments: [
+          'blob'
+        ]
       }
 
      var OK_TICKET_EMAIL_OBJ = {
-        helpdesk_ticket: {
-          email: 'test_.-email@email_em-ail.co.jp'
-        }
+       email: 'test_.-email@email_em-ail.co.jp'
       }
 
      var NOT_OK_TICKET_EMAIL_OBJ = {
-        helpdesk_ticket: {
-          email: 'n@t a valid address'
-        }
-      }
+       email: 'n@t a valid address'
+     }
 
      t.notThrow(function () { Freshdesk.validateHelpdeskObject(OK_TICKET_OBJ) }, 'ticket obj with right key')
-     t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_OBJ) }, 'ticket obj with wrong key')
-     
-     t.notThrow(function () { Freshdesk.validateHelpdeskObject(OK_TICKET_WITH_ATT_OBJ) }, 'ticket obj with right attachment')
-     t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_WITH_ATT_OBJ1) }, 'ticket obj with wrong key of attachment')
-     t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_WITH_ATT_OBJ2) }, 'ticket obj with wrong array of attachment')
-     
+          
      t.notThrow(function () { Freshdesk.validateHelpdeskObject(OK_TICKET_EMAIL_OBJ) }, 'ticket obj with valid email address')
      t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_EMAIL_OBJ) }, 'ticket obj with invalid email address')
     })
@@ -244,21 +224,20 @@ function freshdeskTestRunner() {
     
     test('Ticket', function (t) {
       var TICKET_ID = 1
-      var EXPECTED_ID = 9000658396 // Agent ID of Mike@zixia.net
+//      ??? var EXPECTED_ID = 9000658396 // Agent ID of Mike@zixia.net
 
       var MyFreshdesk = new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
       var oldTicket = new MyFreshdesk.Ticket(TICKET_ID)
       
       
       t.ok(oldTicket, 'loaded')  
-      t.equal(oldTicket.getRawObj().helpdesk_ticket.id, EXPECTED_ID, '9000658396 match id')
+//      Logger.log(JSON.stringify(oldTicket.getRawObj()))
+      t.equal(oldTicket.getRawObj().id, TICKET_ID, 'match ticket id')
       
       var EXAMPLE_TICKET = {
-        'helpdesk_ticket': {
-          'description':'A totally rad description of a what the problem is'
-          , 'subject':'Something like "Cannot log in"'
-          , 'email': 'you@example.com'
-        }
+        'description':'A totally rad description of a what the problem is'
+        , 'subject':'Something like "Cannot log in"'
+        , 'email': 'you@example.com'
       }
       var newTicket = new MyFreshdesk.Ticket(EXAMPLE_TICKET)
       t.ok(newTicket, 'newTicket created')
@@ -272,28 +251,24 @@ function freshdeskTestRunner() {
       t.equal(newTicket.getResponderId(), MIKE_RESPONDER_ID, 'assigned to mike')
 
       
-      var numNotes = newTicket.getRawObj().helpdesk_ticket.notes.length
+      var numNotes = newTicket.getRawObj().notes ? newTicket.getRawObj().notes.length : 0
 
       newTicket.note({
-        helpdesk_note: {
-          body: 'Hi tom, Still Angry'
-          , private: true
-          , attachments: [ 
-            {resource: Utilities.newBlob('TEST DATA').setName('test-data.dat')}
-            , {resource: Utilities.newBlob('TEST DATA2').setName('test-data2.dat')}
-          ]
-        }
+        body: 'Hi tom, Still Angry'
+        , private: true
+        , attachments: [ 
+          Utilities.newBlob('TEST DATA').setName('test-data.dat')
+          , Utilities.newBlob('TEST DATA2').setName('test-data2.dat')
+        ]
       })
       
       newTicket.note({
-        helpdesk_note: {
-          body: 'Hi tom, Still Angry'
-          , private: true
-        }
+        body: 'Hi tom, Still Angry'
+        , private: true
       })
       
-      t.equal(newTicket.getRawObj().helpdesk_ticket.notes.length, numNotes+2, 'new note created')
-      
+      var newNumNotes = newTicket.getRawObj().notes ? newTicket.getRawObj().notes.length : 0
+      t.equal(newNumNotes, numNotes+2, 'new note created')
       
       var priority = newTicket.getPriority()
       newTicket.setPriority(priority+1)
@@ -310,14 +285,12 @@ function freshdeskTestRunner() {
       t.ok(newTicket.del(), 'delete newTicket again')
       
       var EXAMPLE_TICKET_WITH_ATTACHMENTS = {
-        'helpdesk_ticket': {
           'description':'A totally rad description of a what the problem is'
           , 'subject':'Something like "Cannot log in"'
           , 'email': 'you@example.com'
-          , attachments: [ {resource: Utilities.newBlob('TEST DATA').setName('test-data.dat')}
-                          , {resource: Utilities.newBlob('TEST DATA2').setName('test-data2.dat')}
+          , attachments: [ Utilities.newBlob('TEST DATA').setName('test-data.dat')
+                          , Utilities.newBlob('TEST DATA2').setName('test-data2.dat')
                          ]
-        }
       }
       var newTicketWithAttachment = new MyFreshdesk.Ticket(EXAMPLE_TICKET_WITH_ATTACHMENTS)
       t.ok(newTicketWithAttachment, 'newTicketWithAttachment created')
@@ -356,23 +329,21 @@ function freshdeskTestRunner() {
       var BLOB1 = Utilities.newBlob('XXX').setName('xxx')
       var BLOB2 = Utilities.newBlob('TODO').setName('todo')
       var OBJ = {
-        helpdesk_ticket: {
-          attachments: [
-            { resource: BLOB1 }
-            , { resource: BLOB2 }
-          ]
-          , email: 'example@example.com'
-          , subject: 'Ticket Title'
-          , description: 'this is a sample ticket'
-        }
+        attachments: [
+          BLOB1
+          , BLOB2
+        ]
+        , email: 'example@example.com'
+        , subject: 'Ticket Title'
+        , description: 'this is a sample ticket'
       }
       
       var EXPECTED_MULTIPART_ARRAY = [
-        ['helpdesk_ticket[attachments][][resource]', BLOB1]
-        , ['helpdesk_ticket[attachments][][resource]', BLOB2]
-        , ['helpdesk_ticket[email]', 'example@example.com']
-        , ['helpdesk_ticket[subject]', 'Ticket Title']
-        , ['helpdesk_ticket[description]', 'this is a sample ticket']
+        ['attachments[]', BLOB1]
+        , ['attachments[]', BLOB2]
+        , ['email', 'example@example.com']
+        , ['subject', 'Ticket Title']
+        , ['description', 'this is a sample ticket']
       ]
       
       /**
@@ -384,16 +355,16 @@ function freshdeskTestRunner() {
       ////////////////////////////////////////////////////////////////////////////////////////////////////
       var EXPECTED_MULTIPART_BODY = 
           '----boundary-seprator\r\n'
-      + 'Content-Disposition: form-data; name="helpdesk_ticket[attachments][][resource]"; filename="xxx"\r\n' 
+      + 'Content-Disposition: form-data; name="attachments[]"; filename="xxx"\r\n' 
       + 'Content-Type: text/plain\r\n\r\nXXX\r\n'
       + '----boundary-seprator\r\n'
-      + 'Content-Disposition: form-data; name="helpdesk_ticket[attachments][][resource]"; filename="todo"\r\n'
+      + 'Content-Disposition: form-data; name="attachments[]"; filename="todo"\r\n'
       + 'Content-Type: text/plain\r\n\r\nTODO\r\n'
-      + '----boundary-seprator\r\nContent-Disposition: form-data; name="helpdesk_ticket[email]"\r\n\r\n'
+      + '----boundary-seprator\r\nContent-Disposition: form-data; name="email"\r\n\r\n'
       + 'example@example.com\r\n----boundary-seprator\r\n'
-      + 'Content-Disposition: form-data; name="helpdesk_ticket[subject]"\r\n\r\n'
+      + 'Content-Disposition: form-data; name="subject"\r\n\r\n'
       + 'Ticket Title\r\n----boundary-seprator\r\n'
-      + 'Content-Disposition: form-data; name="helpdesk_ticket[description]"\r\n\r\n'
+      + 'Content-Disposition: form-data; name="description"\r\n\r\n'
       + 'this is a sample ticket\r\n----boundary-seprator--\r\n'
       
       EXPECTED_MULTIPART_BODY = Utilities.newBlob(EXPECTED_MULTIPART_BODY).getBytes()

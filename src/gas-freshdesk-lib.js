@@ -14,11 +14,9 @@ var Freshdesk = (function () {
   var MyFreshdesk = new Freshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
   
   var ticket = new MyFreshdesk.Ticket({
-    helpdesk_ticket: {
-      description:'A description'
-      , subject: 'A subject'
-      , email: 'you@example.com'
-    }
+    description:'A description'
+    , subject: 'A subject'
+    , email: 'you@example.com'
   })
   
   ticket.assign(9000658396)
@@ -33,22 +31,22 @@ var Freshdesk = (function () {
   ticket.restore()
   ```
   */
-
-  
-  /**
-  *
-  * PolyFill a dummy log function
-  * in case of forget get rid of log in library(as developing/debuging)\
-  *
-  */
-  if ((typeof log)==='undefined') {
-    Logger.log('PolyFill log: evaled in gas-freshdesk-lib')
-    eval('var log = function () {}')
-  }
   
   
   var Freshdesk = function (url, key) {
-        
+    
+    /**
+    *
+    * Polyfill a dummy log function
+    * in case of forget get rid of log in library(as developing/debuging)\
+    *
+    */
+    if ((typeof log)==='undefined') {
+      Logger.log('Polyfill log: evaled in gas-freshdesk-lib')
+      eval('var log = function () {}')
+    }
+    
+    
     if (!key || !url) throw Error('options error: key or url not exist!')
     
     var http = new Http(url, key)
@@ -90,10 +88,11 @@ var Freshdesk = (function () {
     /**
     *
     * make a http call to api, in order to confirm the auth token is right.
-    *
+    * @tested
     */
     function validateAuth() {
-      return http.get('/helpdesk/tickets/filter/all_tickets?format=json')
+      // v1: return http.get('/helpdesk/tickets/filter/all_tickets?format=json')
+      return http.get('/api/v2/tickets?per_page=1')
     }
     
     /**
@@ -114,16 +113,17 @@ var Freshdesk = (function () {
       
       if (options && options.email) { // Requester email
         var email = validateEmail(options.email)
-        data = http.get('/helpdesk/tickets.json?email=' + email + '&filter_name=all_tickets')
-        
+        // v1 data = http.get('/helpdesk/tickets.json?email=' + email + '&filter_name=all_tickets')
+        data = http.get('/api/v2/tickets?email=' + email)
       } else { // Uses the new_and_my_open filter.
-        data = http.get('/helpdesk/tickets/filter/all_tickets?format=json')
+        // v1 data = http.get('/helpdesk/tickets/filter/all_tickets?format=json')
+        data = http.get('/api/v2/tickets')
         
       }
       
       if (!data || !data.length) return null
       
-      var tickets = data.map(function (d) { return d.display_id })
+      var tickets = data.map(function (d) { return d.id })
       .map(function (i) { return new freshdeskTicket(i) })
       
       return tickets
@@ -141,10 +141,11 @@ var Freshdesk = (function () {
       
       var email = options.email
       
-      var data = http.get('/contacts.json?state=all&query=email%20is%20' + email)
+      // v1 var data = http.get('/contacts.json?state=all&query=email%20is%20' + email)
+      var data = http.get('/api/v2/contacts?email=' + email)
       
-      if (data && data[0] && data[0].user && data[0].user.id) {
-        var id = data[0].user.id
+      if (data && data[0] && data[0].id) {
+        var id = data[0].id
         return new freshdeskContact(id)
       }
       
@@ -162,14 +163,16 @@ var Freshdesk = (function () {
       
       var email = options.email
       
-      var data = http.get('/agents.json?state=all&query=email%20is%20' + email)
-//      log(JSON.stringify(data))
-      if (data && data[0] && data[0].agent && data[0].agent.id) {
-        var id = data[0].agent.id
+      // v1 var data = http.get('/agents.json?state=all&query=email%20is%20' + email)
+      var data = http.get('/api/v2/agents?email=' + email)
+
+      //      log(JSON.stringify(data))
+      if (data && data[0] && data[0].id) {
+        var id = data[0].id
         return new freshdeskAgent(id)
       }
       
-      if (data.access_denied) throw Error('acess denied')
+      //      v1: if (data.access_denied) throw Error('acess denied')
       
       return null
     }
@@ -200,9 +203,13 @@ var Freshdesk = (function () {
         /**
         * 2. new ticket. create it.
         */
+    
+        if (!options.status) options.status = 2 // Status.Open
+        if (!options.priority) options.priority = 1 // Priority.Low
         
         validateHelpdeskObject(options)
-        ticketObj = http.post('/helpdesk/tickets.json', options)
+        // v1 ticketObj = http.post('/helpdesk/tickets.json', options)
+        ticketObj = http.post('/api/v2/tickets', options)
         
       } else {
         // 3. error.
@@ -244,8 +251,9 @@ var Freshdesk = (function () {
       ///////////////////////////////////////////////////////////
       
       function getTicketId() {
-        if (ticketObj && ticketObj.helpdesk_ticket && ticketObj.helpdesk_ticket.display_id) {
-          return ticketObj.helpdesk_ticket.display_id
+//        Logger.log(JSON.stringify(ticketObj))
+        if (ticketObj && ticketObj.id) {
+          return ticketObj.id
         }
         
         return null
@@ -253,8 +261,8 @@ var Freshdesk = (function () {
       
       function getResponderId() {
 
-        if (ticketObj && ticketObj.helpdesk_ticket && ticketObj.helpdesk_ticket.responder_id) {
-          return ticketObj.helpdesk_ticket.responder_id
+        if (ticketObj && ticketObj.responder_id) {
+          return ticketObj.responder_id
         }
         
         return null
@@ -262,32 +270,36 @@ var Freshdesk = (function () {
 
       function getRequesterId() {
 
-        if (ticketObj && ticketObj.helpdesk_ticket && ticketObj.helpdesk_ticket.requester_id) {
-          return ticketObj.helpdesk_ticket.requester_id
+        if (ticketObj && ticketObj.requester_id) {
+          return ticketObj.requester_id
         }
         
         return null
       }
             
       function assignTicket(responderId) {
-        
-        http.put('/helpdesk/tickets/' 
-                 + getTicketId()
-        + '/assign.json?responder_id=' 
-        + responderId
-        )
-        
+
+//        v1:
+//        http.put('/helpdesk/tickets/' 
+//                 + getTicketId()
+//        + '/assign.json?responder_id=' 
+//        + responderId
+//        )
+       
+        http.put('/api/v2/tickets/' + getTicketId(), {
+          responder_id: responderId
+        })
+
         reloadTicket(getTicketId()) // refresh
 
         return this
       }
       
       function deleteTicket() {
-        if ('deleted'==http.del('/helpdesk/tickets/' + getTicketId() + '.json')) {
-          reloadTicket(getTicketId()) // refresh
-          return true
-        }
-        return false
+        // v1: if ('deleted'==http.del('/helpdesk/tickets/' + getTicketId() + '.json')) {
+        http.del('/api/v2/tickets/' + getTicketId())
+        reloadTicket(getTicketId()) // refresh
+        return true
       }
 
       /**
@@ -300,13 +312,11 @@ var Freshdesk = (function () {
         
         if (id%1 !== 0) throw Error('ticket id(' + id + ') must be integer')
         
-        var ret = http.put('/helpdesk/tickets/' + id + '/restore.json')
-        if (ret[0].ticket.deleted === false) {
-          reloadTicket(getTicketId()) // refresh
-          return this
-        }
+        // v1: var ret = http.put('/helpdesk/tickets/' + id + '/restore.json')
+        var ret = http.put('/api/v2/tickets/' + id + '/restore')
         
-        throw Error('restore fail')       
+        reloadTicket(getTicketId()) // refresh
+        return this
       }
       
       /**
@@ -317,9 +327,10 @@ var Freshdesk = (function () {
       function reloadTicket(id) {
         
         if (id%1 !== 0) throw Error('ticket id(' + id + ') must be integer.')
-//      log(log.DEBUG, 'loading id:%s', id)
-        ticketObj = http.get('/helpdesk/tickets/' + id + '.json')
-        
+//     Logger.log('loading id:' + id)
+        // v1: ticketObj = http.get('/helpdesk/tickets/' + id + '.json')
+        ticketObj = http.get('/api/v2/tickets/' + id + '?include=notes')
+//        Logger.log(JSON.stringify(ticketObj))
         return this
       }
     
@@ -333,7 +344,9 @@ var Freshdesk = (function () {
         
         validateHelpdeskObject(data)
         
-        var retVal = http.post('/helpdesk/tickets/' + getTicketId() + '/conversations/note.json', data)
+        // v1: var retVal = http.post('/helpdesk/tickets/' + getTicketId() + '/conversations/note.json', data)
+        var retVal = http.post('/api/v2/tickets/' + getTicketId() + '/notes', data)
+        
         if (retVal) {
           reloadTicket(getTicketId())
           return true
@@ -348,12 +361,11 @@ var Freshdesk = (function () {
       *
       * @tested
       */
-      function getTicketPriority() { return ticketObj.helpdesk_ticket.priority }
+      function getTicketPriority() { return ticketObj.priority }
       function setTicketPriority(priority) {
-        var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
-          helpdesk_ticket: {
-            priority: priority
-          }
+        // v1: var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
+        var retVal = http.put('/api/v2/tickets/' + getTicketId(), {
+          priority: priority
         })
         
         if (retVal) {
@@ -369,12 +381,11 @@ var Freshdesk = (function () {
       *
       * @tested
       */
-      function getTicketStatus() { return ticketObj.helpdesk_ticket.status }      
+      function getTicketStatus() { return ticketObj.status }      
       function setTicketStatus(status) {
-        var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
-          helpdesk_ticket: {
-            status: status
-          }
+        // v1: var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
+        var retVal = http.put('/api/v2/tickets/' + getTicketId(), {
+          status: status
         })
         
         if (retVal) {
@@ -386,10 +397,9 @@ var Freshdesk = (function () {
       }
       
       function setTicketCustomField(customFields) {
-        var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
-          helpdesk_ticket: {
-            custom_field: customFields
-          }
+        // v1: var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
+        var retVal = http.put('/api/v2/tickets/' + getTicketId(), {
+          custom_field: customFields
         })
         
         if (retVal) {
@@ -404,14 +414,15 @@ var Freshdesk = (function () {
         
         throw Error('not implenment yet')
         
-        var ticketTags = ticketObj.helpdesk_ticket.tags
+        var ticketTags = ticketObj.tags
         
 //          "tags":[
 //         {"name": "tag1"},
 //         {"name": "tag2"}
 //    ]
           
-        var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
+        // v1: var retVal = http.put('/helpdesk/tickets/' + getTicketId() + '.json', {
+        var retVal = http.put('/api/v2/tickets/' + getTicketId(), {
           helpdesk: {
             tags: ticketTags
           }
@@ -456,7 +467,8 @@ var Freshdesk = (function () {
         * 2. new contact. create it.
         */
         
-        contactObj = http.post('/contacts.json', options)
+        // v1: contactObj = http.post('/contacts.json', options)
+        contactObj = http.post('/api/v2/contacts', options)
         
       } else {
         // 3. error.
@@ -483,15 +495,16 @@ var Freshdesk = (function () {
       ////////////////////////////////////////////////////////
       
       function getContactId() {
-        if (contactObj && contactObj.user && contactObj.user.id) {
-          return contactObj.user.id
+        if (contactObj && contactObj.id) {
+          return contactObj.id
         }
         
         return null
       }
       
       function deleteContact() {
-        if ('deleted'==http.del('/contacts/' + getContactId() + '.json')) {
+        // v1: if ('deleted'==http.del('/contacts/' + getContactId() + '.json')) {
+        if ('deleted'==http.del('/api/v2/contacts/' + getContactId())) {
           reloadContact(getContactId()) // refresh
           return true
         }
@@ -509,7 +522,8 @@ var Freshdesk = (function () {
         
         if (id%1 !== 0) throw Error('contact id(' + id + ') must be integer.')
         
-        contactObj = http.get('/contacts/' + id + '.json')
+        // v1: contactObj = http.get('/contacts/' + id + '.json')
+        contactObj = http.get('/api/v2/contacts/' + id)
 
         return this
       }
@@ -520,13 +534,12 @@ var Freshdesk = (function () {
       * @testing
       */
       function getContactName() { 
-        return contactObj.user.name 
+        return contactObj.name 
       }
       function setContactName(name) {
-        var retVal = http.put('/contacts/' + getContactId() + '.json', {
-          user: {
-            name: name
-          }
+        // v1: var retVal = http.put('/contacts/' + getContactId() + '.json', {
+        var retVal = http.put('/api/v2/contacts/' + getContactId(), {
+          name: name
         })
         
         if (retVal) {
@@ -538,7 +551,7 @@ var Freshdesk = (function () {
       }
 
       function getContactEmail() {
-        return contactObj.user.email
+        return contactObj.email
       }
       
       /**
@@ -546,9 +559,10 @@ var Freshdesk = (function () {
       *
       * @testing
       */
-      function getContactTitle() { return contactObj.user.job_title }      
+      function getContactTitle() { return contactObj.job_title }      
       function setContactTitle(title) {
-        var retVal = http.put('/contacts/' + getTicketId() + '.json', {
+        // v1: var retVal = http.put('/contacts/' + getTicketId() + '.json', {
+        var retVal = http.put('/api/v2/contacts/' + getTicketId(), {
           user: {
             job_title: title
           }
@@ -604,15 +618,15 @@ var Freshdesk = (function () {
       ///////////////////////////////////////////////
       
       function getAgentId() {
-        if (agentObj && agentObj.agent && agentObj.agent.id) {
-          return agentObj.agent.id
+        if (agentObj && agentObj.id) {
+          return agentObj.id
         }
         
         return null
       }
 
       function getAgentName() { 
-        return agentObj.agent.user.name 
+        return agentObj.contact.name 
       }
       
       /**
@@ -626,7 +640,8 @@ var Freshdesk = (function () {
         
         if (id%1 !== 0) throw Error('agent id(' + id + ') must be integer.')
         
-        agentObj = http.get('/agents/' + id + '.json')
+        // v1: agentObj = http.get('/agents/' + id + '.json')
+        agentObj = http.get('/api/v2/agents/' + id)
 
         return this
       }
@@ -722,7 +737,7 @@ var Freshdesk = (function () {
         contentType = 'multipart/form-data; boundary=' + BOUNDARY
         payload = makeMultipartBody(multipartArray, BOUNDARY)
         
-      } else if (data instanceof Object) {
+      } else if (!data || data instanceof Object) {
         
         /**
         *
@@ -791,7 +806,7 @@ var Freshdesk = (function () {
 //        Logger.log('ttl:' + TTL + ', retCode:' + retCode)
       }
       
-      if (retCode != 200 ) {
+      if (!/^2/.test(retCode) ) { // not 2XX means error
         log('endpoint: ' + endpoint)
         log('options: ' + JSON.stringify(options))
         log(response.getContentText().substring(0,1000))
@@ -847,9 +862,9 @@ var Freshdesk = (function () {
     * @param object data
     * @return string a multipart body
     *
-    * concat attachments for array helpdesk_ticket[attachments][][resource]
+    * concat attachments for array [attachments][]
     *
-    * @tested
+    * @testing
     */
     function makeMultipartBody(multipartArray, boundary) {
       
@@ -996,46 +1011,14 @@ var Freshdesk = (function () {
     throw Error('invalid email: [' + email + ']')
   }
   
+  /**
+  * freshdesk api v2 has better error checking for us.
+  */
   function validateHelpdeskObject(obj) {
+    
     if (!obj || (typeof obj!=='object')) throw Error('invalid helpdesk object: it is not object.')
     
-    var hasApi = false
-    var attachments
-
-    Object.keys(obj).forEach(function (api) {
-//      log('api: ' + api)
-      switch (api) {
-          
-        case 'helpdesk_ticket':
-          
-          validateEmail(obj.helpdesk_ticket.email) // will throw exception if not valid
-          
-          if (obj.helpdesk_ticket.attachments) attachments = obj.helpdesk_ticket.attachments
-          
-          hasApi = true
-          break;
-          
-        case 'helpdesk_note':
-          
-          if (!obj.helpdesk_note.body && !obj.helpdesk_note.body_html) throw Error('invalid helpdesk note: no body found!')
-          
-          if (obj.helpdesk_note.attachments) attachments = obj.helpdesk_note.attachments
-          
-          hasApi = true
-          break;
-          
-        default:
-          break;
-      }
-    })
-    
-    if (attachments) {
-      if (!(attachments instanceof Array) || !attachments.length || !(attachments[0].resource)) {
-        throw Error('invalid help desk object: attachment format error! attachments: ' + attachments)
-      }
-    }
-    
-    if (!hasApi) throw Error('invalid help desk object: no valid api params found!')
+    if (obj.email) validateEmail(obj.email)
     
     // unknown treat as ok
     return true

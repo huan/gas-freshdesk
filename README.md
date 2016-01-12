@@ -163,7 +163,7 @@ For real-world examples from open-source projects using GasL, see Projects Using
 
 ## Version history
 
-### v0.3.0(...): Freshdesk API V2
+### v0.3.0(January 12, 2016)
 * Switch to freshdesk api v2
 * new method added: Ticket.reply() 
 
