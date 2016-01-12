@@ -59,7 +59,7 @@ if ((typeof Freshdesk)==='undefined') { // GasFreshdesk Initialization. (only if
 
 Gas Freshdesk Library use [API v2](http://developer.freshdesk.com/api/) to communicate with freshdesk.
 
-The old version use Freshdesk API v1 is [Gas Freshdesk Library v0.2.0](v0.2.0).
+The old version use Freshdesk API v1 is [Gas Freshdesk Library v0.2.0](#v0.2.0).
 
 ### 1. Class `Freshdesk`
 
@@ -193,10 +193,10 @@ For real-world examples from open-source projects using GasL, see Projects Using
 ## Version history
 
 ### v0.3.0(January 12, 2016)
-* Switch to freshdesk api v2
+* Switch to [Freshdesk API v2](http://developer.freshdesk.com/api/)
 * new method added: Ticket.reply() 
 
-### v0.2.0(January 11, 2016): Freshdesk API v1<a name="v0.2.0"></a>
+### v0.2.0(January 11, 2016): [Freshdesk API v1](https://freshdesk.com/api)<a name="v0.2.0"></a>
 * Add new methods
 * Last version with Freshdesk API v1
 
