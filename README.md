@@ -17,11 +17,9 @@ GasFreshdesk is very clean and easy to use.
 var MyFreshdesk = new Freshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
 
 var ticket = new MyFreshdesk.Ticket({
-  helpdesk_ticket: {
-    description:'A description'
-    , subject: 'A subject'
-    , email: 'you@example.com'
-  }
+  description:'A description'
+  , subject: 'A subject'
+  , email: 'you@example.com'
 })
 
 ticket.assign(9000658396)
@@ -79,8 +77,8 @@ var MyFreshdesk = new Freshdesk(
 
 List or search for tickets. Return a array of Tickets instance.
 
-`options`:
-* `email`: email address of requester
+* `options`:
+  * `email`: email address of requester
 
 if `options` is not provided, then listTickets will uses the new_and_my_open filter.
 
