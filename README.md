@@ -77,8 +77,7 @@ var MyFreshdesk = new Freshdesk(
 
 List or search for tickets. Return a array of Tickets instance.
 
-* `options`:
-  * `email`: email address of requester
+* `options.email`: email address of requester
 
 if `options` is not provided, then listTickets will uses the new_and_my_open filter.
 
@@ -90,15 +89,13 @@ Create a new ticket for you.
 
 ```javascript
 var ticket = new MyFreshdesk.Ticket({
-  helpdesk_ticket: {
-    description:'A totally rad description of a what the problem is'
-    , subject:'Something like "Cannot log in"'
-    , email: 'you@example.com'
-    , attachments: [ 
-      {resource: Utilities.newBlob('TEST DATA').setName('test-data.dat')} 
-      , {resource: Utilities.newBlob('TEST2 DATA').setName('test-data2.dat')} 
-    ]
-  }
+  description:'A totally rad description of a what the problem is'
+  , subject:'Something like "Cannot log in"'
+  , email: 'you@example.com'
+  , attachments: [ 
+    Utilities.newBlob('TEST DATA').setName('test-data.dat')
+    , Utilities.newBlob('TEST2 DATA').setName('test-data2.dat')
+  ]
 })
 ```
 

@@ -115,11 +115,9 @@ var Freshdesk = (function () {
       
       if (options && options.email) { // Requester email
         var email = validateEmail(options.email)
-        // v1 data = http.get('/helpdesk/tickets.json?email=' + email + '&filter_name=all_tickets')
-        data = http.get('/api/v2/tickets?email=' + email)
+        data = http.get('/api/v2/tickets?order_by=created_at&order_type=desc&email=' + email)
       } else { // Uses the new_and_my_open filter.
-        // v1 data = http.get('/helpdesk/tickets/filter/all_tickets?format=json')
-        data = http.get('/api/v2/tickets')
+        data = http.get('/api/v2/tickets?order_by=created_at&order_type=desc&filter=new_and_my_open')
         
       }
       
