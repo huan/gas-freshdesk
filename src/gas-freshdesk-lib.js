@@ -117,7 +117,10 @@ var Freshdesk = (function () {
         var email = validateEmail(options.email)
         // v1 data = http.get('/helpdesk/tickets.json?email=' + email + '&filter_name=all_tickets')
         data = http.get('/api/v2/tickets?email=' + email)
-      } else { // Uses the new_and_my_open filter.
+      } else if (options && options.requester_id) {
+        var requesterId = validateInteger(options.requester_id)
+        data = http.get('/api/v2/tickets?requester_id=' + requesterId)
+      }else { // Uses the new_and_my_open filter.
         // v1 data = http.get('/helpdesk/tickets/filter/all_tickets?format=json')
         data = http.get('/api/v2/tickets')
         
@@ -676,6 +679,7 @@ var Freshdesk = (function () {
   Freshdesk.Http = Http
   Freshdesk.validateHelpdeskObject = validateHelpdeskObject
   Freshdesk.validEmail = validateEmail
+  Freshdesk.validateInteger = validateInteger
   
   return Freshdesk
   
@@ -1031,6 +1035,11 @@ var Freshdesk = (function () {
     if (RE.test(email)) return email
     
     throw Error('invalid email: [' + email + ']')
+  }
+  
+  function validateInteger(num) {
+    if (num%1===0) return num
+    else throw Error('invalid integer: [' + num + ']')
   }
   
   /**

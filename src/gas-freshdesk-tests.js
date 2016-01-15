@@ -106,6 +106,11 @@ function freshdeskTestRunner() {
       var contact = new MyFreshdesk.Contact(contactId)
       
       t.equal(contact.getEmail(), EMAIL, 'contact email match')
+      
+      var ticketId = tickets[0].getId()
+      tickets = MyFreshdesk.listTickets({ requester_id: contactId })
+      t.ok(tickets.length, 'listTickets by requester_id')
+      t.equal(tickets[0].getId(), ticketId, 'search by requester_id')
     })
     
     test('listContacts', function (t) {
@@ -181,6 +186,9 @@ function freshdeskTestRunner() {
           
      t.notThrow(function () { Freshdesk.validateHelpdeskObject(OK_TICKET_EMAIL_OBJ) }, 'ticket obj with valid email address')
      t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_EMAIL_OBJ) }, 'ticket obj with invalid email address')
+     
+     t.throws(function () { Freshdesk.validateInteger('a') }, 'validateInteger a string')
+     t.notThrow(function () { Freshdesk.validateInteger(1) }, 'validateInteger a integer')     
     })
   }
   
