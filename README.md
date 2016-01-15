@@ -29,7 +29,7 @@ ticket.note({
 })
 ticket.reply({
   body: 'Hi tom, Still Angry'
-  , cc_emails: 'you@example.com' 
+  , cc_emails: ['you@example.com']
 })
 ticket.setPriority(2)
 ticket.setStatus(2)
@@ -151,7 +151,7 @@ Reply a ticket.
 ```javascript
 ticket.reply({
   body: 'Hi tom, Still Angry'
-  , cc_emails: 'you@example.com' 
+  , cc_emails: ['you@example.com']
 })
 ```
 ### 3. Class `Contact`
