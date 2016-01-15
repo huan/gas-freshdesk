@@ -88,7 +88,7 @@ function freshdeskTestRunner() {
   ////////////////////////////////////////////////////////////////////////  
   
   function development() {
-
+    testSearch()
   }
   
 
@@ -105,7 +105,15 @@ function freshdeskTestRunner() {
       var contactId = tickets[0].getRequesterId()
       var contact = new MyFreshdesk.Contact(contactId)
       
-      t.equal(contact.getEmail(), EMAIL, 'email match')
+      t.equal(contact.getEmail(), EMAIL, 'contact email match')
+    })
+    
+    test('listContacts', function (t) {
+      var EMAIL = 'you@example.com'
+      contacts = MyFreshdesk.listContacts({ email: EMAIL })
+    
+      t.ok(contacts.length, 'get listContacts result')
+      t.ok(contacts[0].getId(), 'contact id valid')      
     })
   }
   
@@ -131,10 +139,11 @@ function freshdeskTestRunner() {
       
       var MyFreshdesk = new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
       
-      var contact = MyFreshdesk.listContacts({ email: EMAIL })
-      
+      var contacts = MyFreshdesk.listContacts({ email: EMAIL })
+      t.ok(contacts, 'contact list')
+
+      var contact = contacts[0]
       t.ok(contact.getName(), 'contact has name')
-      
       contact.setName(EXPECTED_NAME)
       t.equal(contact.getName(), EXPECTED_NAME, 'contact name as expected')
       

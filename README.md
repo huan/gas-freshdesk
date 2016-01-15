@@ -158,6 +158,12 @@ Logger.log(contact.getEmail())
 
 #### 3.1 `Contact.list()`: List contacts
 
+Search contacts by email.
+
+```javascript
+var contacts = Contact.list({ email: 'you@example.com' })
+Logger.log(contacts[0].getName())
+```
 
 ### 4. Class `Agent`
 

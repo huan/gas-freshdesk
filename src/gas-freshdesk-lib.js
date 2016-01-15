@@ -123,7 +123,7 @@ var Freshdesk = (function () {
         
       }
       
-      if (!data || !data.length) return null
+      if (!data || !data.length) return []
       
       var tickets = data.map(function (d) { return d.id })
       .map(function (i) { return new freshdeskTicket(i) })
@@ -136,8 +136,6 @@ var Freshdesk = (function () {
     *
     * 2. Method Search Contact
     *
-    * now only return the first one
-    * TODO: implement search fun7ctions
     */
     function freshdeskListContacts(options) {
       
@@ -148,10 +146,10 @@ var Freshdesk = (function () {
       
       if (data && data[0] && data[0].id) {
         var id = data[0].id
-        return new freshdeskContact(id)
+        return [new freshdeskContact(id)]
       }
       
-      return null
+      return []
     }
     
     /**
@@ -482,7 +480,6 @@ var Freshdesk = (function () {
         id = options
         
         reloadContact(id)
-
       } else if ((typeof options) === 'object') { // { x: y } options
         
         /**
