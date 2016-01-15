@@ -78,8 +78,14 @@ var MyFreshdesk = new Freshdesk(
 List or search for tickets. Return a array of Tickets instance.
 
 * `options.email`: email address of requester
+* `options.requester_id`: requester_id of requester
 
 if `options` is not provided, then listTickets will uses the new_and_my_open filter.
+
+```javascript
+var tickets = MyFreshdesk.listTickets({ email: 'you@example.com' })
+var tickets = MyFreshdesk.listTickets({ requester_id: 4312412413 })
+```
 
 ### 2. Class `Ticket`
 
@@ -114,6 +120,7 @@ ticket.del()
 ```
 
 #### 2.4 `Ticket.list()`: List tickets
+
 
 #### 2.5 `Ticket.setStatus()`
 
