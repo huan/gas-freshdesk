@@ -115,9 +115,11 @@ var Freshdesk = (function () {
       
       if (options && options.email) { // Requester email
         var email = validateEmail(options.email)
-        data = http.get('/api/v2/tickets?order_by=created_at&order_type=desc&email=' + email)
+        // v1 data = http.get('/helpdesk/tickets.json?email=' + email + '&filter_name=all_tickets')
+        data = http.get('/api/v2/tickets?email=' + email)
       } else { // Uses the new_and_my_open filter.
-        data = http.get('/api/v2/tickets?order_by=created_at&order_type=desc&filter=new_and_my_open')
+        // v1 data = http.get('/helpdesk/tickets/filter/all_tickets?format=json')
+        data = http.get('/api/v2/tickets')
         
       }
       
@@ -1008,6 +1010,9 @@ var Freshdesk = (function () {
     }
     
     function isAttachment(v) {
+      // 20160115 a array which include 1 Blob, toString() will also return a 'Blob'
+      if (v instanceof Array) return false
+
       if (v.toString() == 'Blob' || v.toString() == 'GmailAttachment') {
         return true 
       }
