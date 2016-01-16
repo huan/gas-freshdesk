@@ -204,9 +204,10 @@ For real-world examples from open-source projects using GasL, see Projects Using
 * Switch to [Freshdesk API v2](http://developer.freshdesk.com/api/)
 * new method added: Ticket.reply() 
 
-### v0.2.0(January 11, 2016): [Freshdesk API v1](https://freshdesk.com/api)<a name="v0.2.0"></a>
-* Add new methods
-* Last version with Freshdesk API v1
+### [v0.2.0(January 11, 2016)[https://github.com/zixia/gas-freshdesk/releases/tag/v0.2.0]: [Freshdesk API v1](https://freshdesk.com/api)<a name="v0.2.0"></a>
+* Last stable version with [Freshdesk API v1](https://freshdesk.com/api)<a name="v0.2.0"></a>
+* [v0.2.0 README](https://github.com/zixia/gas-freshdesk/blob/v0.2.0/README.md)
+* [v0.2.0 Test Suite](https://github.com/zixia/gas-freshdesk/blob/v0.2.0/src/gas-freshdesk-tests.js)
 
 To use the v0.2.0 gas-freshdesk library with freshdesk api v1, put the following snip in your gas code.
 ```javascript
@@ -214,6 +215,7 @@ if ((typeof Freshdesk)==='undefined') { // GasFreshdesk Initialization. (only if
   eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gas-freshdesk/v0.2.0/src/gas-freshdesk-lib.js').getContentText())
 } // Class Freshdesk is ready for use now!
 ```
+
 
 ### v0.1.0(December 16, 2015)
 * Initial public release.
