@@ -204,8 +204,8 @@ For real-world examples from open-source projects using GasL, see Projects Using
 * Switch to [Freshdesk API v2](http://developer.freshdesk.com/api/)
 * new method added: Ticket.reply() 
 
-### [v0.2.0(January 11, 2016)](https://github.com/zixia/gas-freshdesk/releases/tag/v0.2.0): [Freshdesk API v1](https://freshdesk.com/api)<a name="v0.2.0"></a>
-* Last stable version with [Freshdesk API v1](https://freshdesk.com/api)<a name="v0.2.0"></a>
+### [v0.2.0(January 11, 2016)](https://github.com/zixia/gas-freshdesk/releases/tag/v0.2.0)<a name="v0.2.0"></a>
+* Last stable version with [Freshdesk API v1](https://freshdesk.com/api)
 * [v0.2.0 README](https://github.com/zixia/gas-freshdesk/blob/v0.2.0/README.md)
 * [v0.2.0 Test Suite](https://github.com/zixia/gas-freshdesk/blob/v0.2.0/src/gas-freshdesk-tests.js)
 
