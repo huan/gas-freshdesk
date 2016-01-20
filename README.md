@@ -14,7 +14,7 @@ I found Freshdesk API very hard to use and debug in GAS, especialy with attachme
 GasFreshdesk is very clean and easy to use.
 
 ```javascript
-var MyFreshdesk = new Freshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
+var MyFreshdesk = new GasFreshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
 
 var ticket = new MyFreshdesk.Ticket({
   description:'A description'
@@ -67,7 +67,7 @@ The old version use Freshdesk API v1 is [Gas Freshdesk Library v0.2.0](#v0.2.0).
 Return MyFreshdesk for you.
 
 ```javascript
-var MyFreshdesk = new Freshdesk(
+var MyFreshdesk = new GasFreshdesk(
   'YOUR_FRESHDESK_URL_HERE' // i.e. https://mikebo.freshdesk.com
   , 'YOUR_API_KEY_HERE'
 )
@@ -200,8 +200,9 @@ For real-world examples from open-source projects using GasL, see Projects Using
 
 ## Version history
 
-### v0.3.0(January 12, 2016)
+### v0.3.0(January 20, 2016)
 * Switch to [Freshdesk API v2](http://developer.freshdesk.com/api/)
+* Change library name from`Freshdesk` to `GasFreshdesk`
 * new method added: Ticket.reply() 
 
 ### [v0.2.0(January 11, 2016)](https://github.com/zixia/gas-freshdesk/releases/tag/v0.2.0)<a name="v0.2.0"></a>

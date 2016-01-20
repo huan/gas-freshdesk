@@ -17,7 +17,7 @@ function freshdeskTestRunner() {
   *
   * Example:
   ```javascript
-  var MyFreshdesk = new Freshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
+  var MyFreshdesk = new GasFreshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
   
   var ticket = new MyFreshdesk.Ticket({
     description:'A description'
@@ -93,7 +93,7 @@ function freshdeskTestRunner() {
   
 
   function testSearch() {
-    var MyFreshdesk =  new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
+    var MyFreshdesk =  new GasFreshdesk(FRESHDESK_URL, FRESHDESK_KEY)
     
     test('listTickets', function (t) {
       var EMAIL = 'you@example.com'
@@ -127,7 +127,7 @@ function freshdeskTestRunner() {
     test ('Agent', function (t) {
       var EMAIL = 'zixia@zixia.net'
       
-      var MyFreshdesk = new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
+      var MyFreshdesk = new GasFreshdesk(FRESHDESK_URL, FRESHDESK_KEY)
       
       var agent = MyFreshdesk.listAgents({ email: EMAIL })
       
@@ -142,7 +142,7 @@ function freshdeskTestRunner() {
       var EMAIL = 'you@example.com'
       var EXPECTED_NAME = 'expected name'
       
-      var MyFreshdesk = new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
+      var MyFreshdesk = new GasFreshdesk(FRESHDESK_URL, FRESHDESK_KEY)
       
       var contacts = MyFreshdesk.listContacts({ email: EMAIL })
       t.ok(contacts, 'contact list')
@@ -182,13 +182,13 @@ function freshdeskTestRunner() {
        email: 'n@t a valid address'
      }
 
-     t.notThrow(function () { Freshdesk.validateHelpdeskObject(OK_TICKET_OBJ) }, 'ticket obj with right key')
+     t.notThrow(function () { GasFreshdesk.validateHelpdeskObject(OK_TICKET_OBJ) }, 'ticket obj with right key')
           
-     t.notThrow(function () { Freshdesk.validateHelpdeskObject(OK_TICKET_EMAIL_OBJ) }, 'ticket obj with valid email address')
-     t.throws(function () { Freshdesk.validateHelpdeskObject(NOT_OK_TICKET_EMAIL_OBJ) }, 'ticket obj with invalid email address')
+     t.notThrow(function () { GasFreshdesk.validateHelpdeskObject(OK_TICKET_EMAIL_OBJ) }, 'ticket obj with valid email address')
+     t.throws(function () { GasFreshdesk.validateHelpdeskObject(NOT_OK_TICKET_EMAIL_OBJ) }, 'ticket obj with invalid email address')
      
-     t.throws(function () { Freshdesk.validateInteger('a') }, 'validateInteger a string')
-     t.notThrow(function () { Freshdesk.validateInteger(1) }, 'validateInteger a integer')     
+     t.throws(function () { GasFreshdesk.validateInteger('a') }, 'validateInteger a string')
+     t.notThrow(function () { GasFreshdesk.validateInteger(1) }, 'validateInteger a integer')     
     })
   }
   
@@ -211,7 +211,7 @@ function freshdeskTestRunner() {
         }
       }
       
-      var http = Freshdesk.Http('a','b')
+      var http = GasFreshdesk.Http('a','b')
       
       var hasAtt = http.hasAttachment(HAS_ATTACHMENT)
       t.ok(hasAtt, 'HAS_ATTACHMENT has attachment')
@@ -227,7 +227,7 @@ function freshdeskTestRunner() {
       var TICKET_ID = 1
 //      ??? var EXPECTED_ID = 9000658396 // Agent ID of Mike@zixia.net
 
-      var MyFreshdesk = new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
+      var MyFreshdesk = new GasFreshdesk(FRESHDESK_URL, FRESHDESK_KEY)
       var oldTicket = new MyFreshdesk.Ticket(TICKET_ID)
       
       
@@ -314,29 +314,29 @@ function freshdeskTestRunner() {
   
   function testFreshdeskAuth() {
     test('Auth Fail', function (t) {
-      var ERR_URL = 'http://zixia.freshdesk.com'
+      var ERR_URL = 'https://zixia.freshdesk.com'
       t.throws(function () {
-        new Freshdesk(ERR_URL, FRESHDESK_KEY)
-      }, 'Auth should throw with ERR_URL')
+        new GasFreshdesk(ERR_URL, FRESHDESK_KEY)
+      }, 'Auth with ERR_URL')
       
       t.throws(function () {
-        new Freshdesk(FRESHDESK_URL, 'error_key')
-      }, 'Auth should throw with error_key')
+        new GasFreshdesk(FRESHDESK_URL, 'error_key')
+      }, 'Auth with error_key')
       
       t.throws(function () {
-        new Freshdesk('not_exist_url', FRESHDESK_KEY)
-      }, 'Auth should throw with not_exist_url')
+        new GasFreshdesk('not_exist_url', FRESHDESK_KEY)
+      }, 'Auth with not_exist_url')
 
       t.notThrow(function () {
-        new Freshdesk(FRESHDESK_URL, FRESHDESK_KEY)
-      }, 'Auth should not throw with right setting')
+        new GasFreshdesk(FRESHDESK_URL, FRESHDESK_KEY)
+      }, 'Auth with right setting')
     })
   }
   
   function testHttpBackend() {
     test('Multipart body process', function (t) {
       
-      var http = new Freshdesk.Http(FRESHDESK_URL, FRESHDESK_KEY)
+      var http = new GasFreshdesk.Http(FRESHDESK_URL, FRESHDESK_KEY)
       
       var BLOB1 = Utilities.newBlob('XXX').setName('xxx')
       var BLOB2 = Utilities.newBlob('TODO').setName('todo')
@@ -388,7 +388,7 @@ function freshdeskTestRunner() {
     })
 
     test('Http Methods', function (t) {
-      var http = new Freshdesk.Http(FRESHDESK_URL, FRESHDESK_KEY)
+      var http = new GasFreshdesk.Http(FRESHDESK_URL, FRESHDESK_KEY)
 
       var data = http.get('http://httpbin.org/get?test=ok')
       t.equal(typeof data, 'object', 'json')

@@ -1,4 +1,4 @@
-var Freshdesk = (function () {
+var GasFreshdesk = (function () {
   'use strict'
   /**
   *
@@ -11,7 +11,7 @@ var Freshdesk = (function () {
   *
   * Example:
   ```javascript
-  var MyFreshdesk = new Freshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
+  var MyFreshdesk = new GasFreshdesk('https://mikebo.freshdesk.com', 'Jrg0FQNzX3tzuHbiFjYQ')
   
   var ticket = new MyFreshdesk.Ticket({
     description:'A description'
@@ -101,12 +101,12 @@ var Freshdesk = (function () {
     *
     * 1. Method Search Ticket
     *
-    * @return array of Tickets of search. null for not found
+    * @return {Array} Tickets of search. null for not found
     * 
-    * @param array options
+    * @param {Object} options
     *   email: email address of requester
     *
-    * @document https://freshdesk.com/api#view_all_ticket
+    * @document https://development.freshdesk.com/api#view_all_ticket
     *
     */
     function freshdeskListTickets(options) {
