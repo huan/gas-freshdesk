@@ -20,6 +20,7 @@ var ticket = new MyFreshdesk.Ticket({
   description:'A description'
   , subject: 'A subject'
   , email: 'you@example.com'
+  , attachments: [ Utilities.newBlob('TEST DATA').setName('test-data.dat') ]
 })
 
 ticket.assign(9000658396)
@@ -47,7 +48,7 @@ It's very clean and easy to use, huh ;-)
 To use GasFreshdesk in your GAS script editor, just add the follow lines, then you are set.
 
 ```javascript
-if ((typeof Freshdesk)==='undefined') { // GasFreshdesk Initialization. (only if not initialized yet.)
+if ((typeof GasFreshdesk)==='undefined') { // GasFreshdesk Initialization. (only if not initialized yet.)
   eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gas-freshdesk/master/src/gas-freshdesk-lib.js').getContentText())
 } // Class Freshdesk is ready for use now!
 
@@ -75,7 +76,7 @@ var MyFreshdesk = new GasFreshdesk(
 
 #### 1.2 `MyFreshdesk.listTickets(options)`
 
-List or search for tickets. Return a array of Tickets instance.
+List or search for tickets. Return a array of instances of Ticket.
 
 * `options.email`: email address of requester
 * `options.requester_id`: requester_id of requester
@@ -203,7 +204,7 @@ For real-world examples from open-source projects using GasL, see Projects Using
 ### v0.3.0(January 20, 2016)
 * Switch to [Freshdesk API v2](http://developer.freshdesk.com/api/)
 * Change library name from`Freshdesk` to `GasFreshdesk`
-* new method added: Ticket.reply() 
+* Added new method: Ticket.reply() 
 
 ### [v0.2.0(January 11, 2016)](https://github.com/zixia/gas-freshdesk/releases/tag/v0.2.0)<a name="v0.2.0"></a>
 * Last stable version with [Freshdesk API v1](https://freshdesk.com/api)

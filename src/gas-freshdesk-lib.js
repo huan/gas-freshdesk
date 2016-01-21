@@ -17,6 +17,7 @@ var GasFreshdesk = (function () {
     description:'A description'
     , subject: 'A subject'
     , email: 'you@example.com'
+    , attachments: [ Utilities.newBlob('TEST DATA').setName('test-data.dat') ]
   })
   
   ticket.assign(9000658396)
@@ -828,11 +829,72 @@ var GasFreshdesk = (function () {
 //        Logger.log('ttl:' + TTL + ', retCode:' + retCode)
       }
       
-      if (!/^2/.test(retCode) ) { // not 2XX means error
-        log(log.DEBUG, 'endpoint: ' + endpoint)
-        log(log.DEBUG, 'options: ' + JSON.stringify(options))
-        log(log.DEBUG, response.getContentText().substring(0,1000))
-        throw Error('http call failed with code:' + response.getResponseCode())
+      switch (true) {
+        case /^2/.test(retCode):
+          // It's ok with 2XX
+          break;
+          
+        case /^3/.test(retCode):
+          // TBD: OK? NOT OK???
+          break;
+          
+        case /^4/.test(retCode):
+        case /^5/.test(retCode):
+          /**
+          *
+          * Get Detail Error Response from Freshdesk API v2
+          * http://developer.freshdesk.com/api/#error
+          *
+          */
+          try {
+            var respObj = JSON.parse(response.getContentText());
+            
+            var description = respObj.description
+            var errors = respObj.errors
+            
+            if (errors && errors instanceof Array) {
+              var errorMsg = errors.map(function (e) { 
+                return Utilities.formatString('code[%s], field[%s], message[%s]'
+                                              , e.code || ''
+                                              , e.field || ''
+                                              , e.message || ''
+                                             )
+              }).reduce(function (v1, v2) {
+                return v1 + '; ' + v2
+              })
+              
+              // clean options
+              options.payload = JSON.parse(options.payload)
+              if (options.payload.body_html) options.payload.body_html = '...STRIPED...'
+              if (options.payload.description_html) options.payload.description_html = '...STRIPED...'
+              options = JSON.stringify(options)
+              
+              var apiErrorMsg = Utilities
+              .formatString('Freshdesk API v2 failed when calling endpoint[%s], options[%s], description[%s] with #%s errors: (%s)'
+                            , endpoint
+                            , options
+                            , description || ''
+                            , errors.length || 0
+                            , errorMsg || ''
+                           )            
+              }
+          } catch (e) {
+            Logger.log(e.name + ',' + e.message + ',' + e.stack)
+          }
+
+          if (apiErrorMsg)
+            throw Error(apiErrorMsg);
+          
+          throw Error('http call failed with http code:' + response.getResponseCode());
+            
+          break;
+          
+        default:
+          log(log.DEBUG, 'endpoint: ' + endpoint)
+          log(log.DEBUG, 'options: ' + JSON.stringify(options))
+          log(log.DEBUG, response.getContentText().substring(0,1000))
+          throw Error('api call failed with http code:' + response.getResponseCode())
+          break;
       }
       
       var retContent = response.getContentText()
