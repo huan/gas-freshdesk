@@ -212,10 +212,18 @@ For real-world examples from open-source projects using GasL, see Projects Using
 
 ## Version history
 
-### v0.3.0(January 20, 2016)
+### v0.3.0(January 20, 2016)(https://github.com/zixia/gas-freshdesk/releases/tag/v0.3.0)<a name="v0.3.0"></a>
 * Switch to [Freshdesk API v2](http://developer.freshdesk.com/api/)
 * Change library name from`Freshdesk` to `GasFreshdesk`
 * Added new method: Ticket.reply() 
+
+To use the v0.3.0 gas-freshdesk library, put the following snip in your gas code.
+
+```javascript
+if ((typeof Freshdesk)==='undefined') { // GasFreshdesk Initialization. (only if not initialized yet.)
+  eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gas-freshdesk/v0.3.0/src/gas-freshdesk-lib.js').getContentText())
+} // Class Freshdesk is ready for use now!
+```
 
 ### [v0.2.0(January 11, 2016)](https://github.com/zixia/gas-freshdesk/releases/tag/v0.2.0)<a name="v0.2.0"></a>
 * Last stable version with [Freshdesk API v1](https://freshdesk.com/api)
@@ -223,6 +231,7 @@ For real-world examples from open-source projects using GasL, see Projects Using
 * [v0.2.0 Test Suite](https://github.com/zixia/gas-freshdesk/blob/v0.2.0/src/gas-freshdesk-tests.js)
 
 To use the v0.2.0 gas-freshdesk library with freshdesk api v1, put the following snip in your gas code.
+
 ```javascript
 if ((typeof Freshdesk)==='undefined') { // GasFreshdesk Initialization. (only if not initialized yet.)
   eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gas-freshdesk/v0.2.0/src/gas-freshdesk-lib.js').getContentText())
