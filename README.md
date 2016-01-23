@@ -50,7 +50,7 @@ To use GasFreshdesk in your GAS script editor, just add the follow lines, then y
 ```javascript
 if ((typeof GasFreshdesk)==='undefined') { // GasFreshdesk Initialization. (only if not initialized yet.)
   eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gas-freshdesk/master/src/gas-freshdesk-lib.js').getContentText())
-} // Class Freshdesk is ready for use now!
+} // Class GasFreshdesk is ready for use now!
 
 ```
 
@@ -60,10 +60,10 @@ Gas Freshdesk Library use [API v2](http://developer.freshdesk.com/api/) to commu
 
 The old version use Freshdesk API v1 is [Gas Freshdesk Library v0.2.0](#v0.2.0).
 
-### 1. Class `Freshdesk`
+### 1. Class `GasFreshdesk`
 
 
-#### 1.1 `Freshdesk(url, key)`: Class constructor for Freshdesk
+#### 1.1 `GasFreshdesk(url, key)`: Class constructor for Freshdesk
 
 Return MyFreshdesk for you.
 
@@ -222,7 +222,7 @@ To use the v0.3.0 gas-freshdesk library, put the following snip in your gas code
 ```javascript
 if ((typeof Freshdesk)==='undefined') { // GasFreshdesk Initialization. (only if not initialized yet.)
   eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gas-freshdesk/v0.3.0/src/gas-freshdesk-lib.js').getContentText())
-} // Class Freshdesk is ready for use now!
+} // Class GasFreshdesk is ready for use now!
 ```
 
 ### [v0.2.0(January 11, 2016)](https://github.com/zixia/gas-freshdesk/releases/tag/v0.2.0)<a name="v0.2.0"></a>
@@ -235,7 +235,7 @@ To use the v0.2.0 gas-freshdesk library with freshdesk api v1, put the following
 ```javascript
 if ((typeof Freshdesk)==='undefined') { // GasFreshdesk Initialization. (only if not initialized yet.)
   eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/zixia/gas-freshdesk/v0.2.0/src/gas-freshdesk-lib.js').getContentText())
-} // Class Freshdesk is ready for use now!
+} // Class GasFreshdesk is ready for use now!
 ```
 
 

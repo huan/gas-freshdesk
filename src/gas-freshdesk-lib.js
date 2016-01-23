@@ -121,15 +121,15 @@ var GasFreshdesk = (function () {
         var requesterId = validateInteger(options.requester_id)
         data = http.get('/api/v2/tickets?order_by=created_at&order_type=asc&requester_id=' + requesterId)
       }else { // Uses the new_and_my_open filter.
-        // v1 data = http.get('/helpdesk/tickets/filter/all_tickets?format=json')
         data = http.get('/api/v2/tickets')
         
       }
       
       if (!data || !data.length) return []
       
-      var tickets = data.map(function (d) { return d.id })
-      .map(function (i) { return new freshdeskTicket(i) })
+      var tickets = data.map(function (d) { 
+        return new freshdeskTicket(d.id)
+      })
       
       return tickets
     }
@@ -144,15 +144,15 @@ var GasFreshdesk = (function () {
       
       var email = options.email
       
-      // v1 var data = http.get('/contacts.json?state=all&query=email%20is%20' + email)
       var data = http.get('/api/v2/contacts?email=' + email)
       
-      if (data && data[0] && data[0].id) {
-        var id = data[0].id
-        return [new freshdeskContact(id)]
-      }
+      if (!data || !data.length) return []
+
+      var contacts = data.map(function (d) { 
+        return new freshdeskContact(d.id)
+      })
       
-      return []
+      return contacts
     }
     
     /**
@@ -172,12 +172,13 @@ var GasFreshdesk = (function () {
       
       var data = http.get('/api/v2/agents?email=' + email)
 
-      if (data && data[0] && data[0].id) {
-        var id = data[0].id
-        return [new freshdeskAgent(id)]
-      }
-           
-      return null
+      if (!data || !data.length) return []
+
+      var agents = data.map(function (d) { 
+        return new freshdeskAgent(d.id)
+      })
+      
+      return agents
     }
 
     /******************************************************************
