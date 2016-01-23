@@ -158,7 +158,7 @@ ticket.reply({
 ### 3. Class `Contact`
 
 ```javascript
-var requesterId = Ticket.getRequesterId()
+var requesterId = ticket.getRequesterId()
 var contact = new MyFreshdesk.Contact(requesterId)
 
 Logger.log(contact.getEmail())
@@ -169,6 +169,7 @@ Logger.log(contact.getEmail())
 Search contacts by email.
 
 ```javascript
+var Contact = GasFreshdesk.Contact
 var contacts = Contact.list({ email: 'you@example.com' })
 Logger.log(contacts[0].getName())
 ```
@@ -177,7 +178,17 @@ Logger.log(contacts[0].getName())
 
 TBW
 
-#### 4.1 `Agent.list()`: List agents
+#### 4.1 `Agent.list(options)`: List agents
+
+Search for agent.
+
+* options.email email of agent
+
+```javascript
+var Agent = GasFreshdesk.Agent
+var agents = Agent.list({ email: 'you@example.com' })
+Logger.log(agents[0].getId())
+```
 
 ## Test Suites
 

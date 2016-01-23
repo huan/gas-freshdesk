@@ -159,24 +159,24 @@ var GasFreshdesk = (function () {
     *
     * 3. Method Search Agent
     *
-    * now only return the first one
-    * TODO: implement search functions
+    * @param
+    * options.email <String> email of agent
+    * 
+    * @return
+    * <Array> of <Agent>, or null for not found.
+    *
     */
     function freshdeskListAgents(options) {
       
       var email = options.email
       
-      // v1 var data = http.get('/agents.json?state=all&query=email%20is%20' + email)
       var data = http.get('/api/v2/agents?email=' + email)
 
-      //      log(JSON.stringify(data))
       if (data && data[0] && data[0].id) {
         var id = data[0].id
-        return new freshdeskAgent(id)
+        return [new freshdeskAgent(id)]
       }
-      
-      //      v1: if (data.access_denied) throw Error('acess denied')
-      
+           
       return null
     }
 
@@ -846,14 +846,18 @@ var GasFreshdesk = (function () {
           * http://developer.freshdesk.com/api/#error
           *
           */
+          var apiErrorMsg
+          
           try {
             var respObj = JSON.parse(response.getContentText());
             
             var description = respObj.description
             var errors = respObj.errors
             
+            var errorMsg
+            
             if (errors && errors instanceof Array) {
-              var errorMsg = errors.map(function (e) { 
+              errorMsg = errors.map(function (e) { 
                 return Utilities.formatString('code[%s], field[%s], message[%s]'
                                               , e.code || ''
                                               , e.field || ''
@@ -861,23 +865,32 @@ var GasFreshdesk = (function () {
                                              )
               }).reduce(function (v1, v2) {
                 return v1 + '; ' + v2
-              })
+              });
               
-              // clean options
-              options.payload = JSON.parse(options.payload)
+            } else if (respObj.code) {
+              errorMsg = Utilities.formatString('code[%s], field[%s], message[%s]'
+                                                , respObj.code || ''
+                                                , respObj.field || ''
+                                                , respObj.message || ''
+                                               )
+            }
+
+            // clean options
+            if (options.payload) {
+              options.payload = options.payload ? JSON.parse(options.payload) : {}
+              
               if (options.payload.body_html) options.payload.body_html = '...STRIPED...'
               if (options.payload.description_html) options.payload.description_html = '...STRIPED...'
-              options = JSON.stringify(options)
-              
-              var apiErrorMsg = Utilities
-              .formatString('Freshdesk API v2 failed when calling endpoint[%s], options[%s], description[%s] with #%s errors: (%s)'
-                            , endpoint
-                            , options
-                            , description || ''
-                            , errors.length || 0
-                            , errorMsg || ''
-                           )            
-              }
+            }
+            options = JSON.stringify(options)
+            
+            apiErrorMsg = Utilities
+            .formatString('Freshdesk API v2 failed when calling endpoint[%s], options[%s], description[%s] with error: (%s)'
+                          , endpoint
+                          , options
+                          , description || ''
+                          , errorMsg || ''
+                         )            
           } catch (e) {
             Logger.log(e.name + ',' + e.message + ',' + e.stack)
           }

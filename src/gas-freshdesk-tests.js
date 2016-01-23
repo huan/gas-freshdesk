@@ -129,7 +129,11 @@ function freshdeskTestRunner() {
       
       var MyFreshdesk = new GasFreshdesk(FRESHDESK_URL, FRESHDESK_KEY)
       
-      var agent = MyFreshdesk.listAgents({ email: EMAIL })
+      var agents = MyFreshdesk.listAgents({ email: EMAIL })
+      
+      t.ok(agents.length, 'lsitAgents')
+      
+      var agent = agents[0]
       
       t.ok(agent.getName(), 'agent has name')
       t.ok(agent.getId(), 'agent has id')
