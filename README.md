@@ -212,7 +212,7 @@ For real-world examples from open-source projects using GasL, see Projects Using
 
 ## Version history
 
-### v0.3.0(January 20, 2016)(https://github.com/zixia/gas-freshdesk/releases/tag/v0.3.0)<a name="v0.3.0"></a>
+### [v0.3.0(January 20, 2016)](https://github.com/zixia/gas-freshdesk/releases/tag/v0.3.0)<a name="v0.3.0"></a>
 * Switch to [Freshdesk API v2](http://developer.freshdesk.com/api/)
 * Change library name from`Freshdesk` to `GasFreshdesk`
 * Added new method: Ticket.reply() 
