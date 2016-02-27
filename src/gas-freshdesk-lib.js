@@ -116,7 +116,7 @@ var GasFreshdesk = (function () {
       
       if (options && options.email) { // Requester email
         var email = validateEmail(options.email)
-        data = http.get('/api/v2/tickets?order_by=created_at&order_type=asc&email=' + email)
+        data = http.get('/api/v2/tickets?order_by=created_at&order_type=asc&email=' + encodeURIComponent(email))
       } else if (options && options.requester_id) {
         var requesterId = validateInteger(options.requester_id)
         data = http.get('/api/v2/tickets?order_by=created_at&order_type=asc&requester_id=' + requesterId)
@@ -144,7 +144,7 @@ var GasFreshdesk = (function () {
       
       var email = options.email
       
-      var data = http.get('/api/v2/contacts?email=' + email)
+      var data = http.get('/api/v2/contacts?email=' + encodeURIComponent(email))
       
       if (!data || !data.length) return []
 
@@ -170,7 +170,7 @@ var GasFreshdesk = (function () {
       
       var email = options.email
       
-      var data = http.get('/api/v2/agents?email=' + email)
+      var data = http.get('/api/v2/agents?email=' + encodeURIComponent(email))
 
       if (!data || !data.length) return []
 
@@ -235,6 +235,9 @@ var GasFreshdesk = (function () {
       
       this.getStatus = getTicketStatus
       this.setStatus = setTicketStatus
+      
+      this.getGroup = getTicketGroup
+      this.setGroup = setTicketGroup
       
       this.open = function () { return setTicketStatus(2) }
       this.pend = function () { return setTicketStatus(3) }
@@ -418,6 +421,20 @@ var GasFreshdesk = (function () {
         }
         
         throw Error('set status fail')  
+      }
+      
+      function getTicketGroup() { return ticketObj.group_id }
+      function setTicketGroup(groupId) {
+        var retVal = http.put('/api/v2/tickets/' + getTicketId(), {
+          group_id: groupId
+        })
+        
+        if (retVal) {
+          reloadTicket(getTicketId())
+          return this
+        }
+        
+        throw Error('set group fail')  
       }
       
       function setTicketCustomField(customFields) {

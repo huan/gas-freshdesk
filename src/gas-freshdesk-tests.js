@@ -59,6 +59,7 @@ function freshdeskTestRunner() {
   */
   
 //  return development()
+//  return (testSearch() + test.finish())
 
   /*
   *******************************************************************/
@@ -97,6 +98,7 @@ function freshdeskTestRunner() {
     
     test('listTickets', function (t) {
       var EMAIL = 'you@example.com'
+            
       tickets = MyFreshdesk.listTickets({ email: EMAIL })
     
       t.ok(tickets.length, 'get listTickets result')
@@ -111,6 +113,12 @@ function freshdeskTestRunner() {
       tickets = MyFreshdesk.listTickets({ requester_id: contactId })
       t.ok(tickets.length, 'listTickets by requester_id')
       t.equal(tickets[0].getId(), ticketId, 'search by requester_id')
+      
+      // XXX
+//      var EMAIL_NEED_ENCODE = 'you+owner@example.com'
+//      t.notThrow(function () { 
+//        MyFreshdesk.listTickets({ email: EMAIL_NEED_ENCODE }) 
+//      }, 'search email include "+"')
     })
     
     test('listContacts', function (t) {
@@ -247,6 +255,10 @@ function freshdeskTestRunner() {
       var newTicket = new MyFreshdesk.Ticket(EXAMPLE_TICKET)
       t.ok(newTicket, 'newTicket created')
       t.ok(newTicket.getId(), 'newTicket id exist')
+      
+      newTicket.close()
+//      Logger.log(JSON.stringify((newTicket.getRawObj())))
+      newTicket.open()
       
       var ZIXIA_RESPONDER_ID = 9005923152 // zixia@zixia.net
       var MIKE_RESPONDER_ID = 9005923143 // mike@zixia.net
