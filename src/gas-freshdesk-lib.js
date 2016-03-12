@@ -337,7 +337,8 @@ var GasFreshdesk = (function () {
         if (id%1 !== 0) throw Error('ticket id(' + id + ') must be integer.')
 //     Logger.log('loading id:' + id)
         // v1: ticketObj = http.get('/helpdesk/tickets/' + id + '.json')
-        ticketObj = http.get('/api/v2/tickets/' + id + '?include=notes')
+//        ticketObj = http.get('/api/v2/tickets/' + id + '?include=notes')
+        ticketObj = http.get('/api/v2/tickets/' + id + '?include=conversations')
 //        Logger.log(JSON.stringify(ticketObj))
         return this
       }

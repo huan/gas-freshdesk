@@ -60,6 +60,7 @@ function freshdeskTestRunner() {
   
 //  return development()
 //  return (testSearch() + test.finish())
+//  return (testFreshdeskTicket() + test.finish())
 
   /*
   *******************************************************************/
@@ -89,7 +90,14 @@ function freshdeskTestRunner() {
   ////////////////////////////////////////////////////////////////////////  
   
   function development() {
-    testSearch()
+    test('Ticket', function (t) {
+      var TICKET_ID = 1
+      //      ??? var EXPECTED_ID = 9000658396 // Agent ID of Mike@zixia.net
+      
+      var MyFreshdesk = new GasFreshdesk(FRESHDESK_URL, FRESHDESK_KEY)
+      var oldTicket = new MyFreshdesk.Ticket(TICKET_ID)
+      })
+
   }
   
 
@@ -268,7 +276,8 @@ function freshdeskTestRunner() {
       t.equal(newTicket.getResponderId(), MIKE_RESPONDER_ID, 'assigned to mike')
 
       
-      var numNotes = newTicket.getRawObj().notes ? newTicket.getRawObj().notes.length : 0
+//      var numNotes = newTicket.getRawObj().notes ? newTicket.getRawObj().notes.length : 0
+      var numNotes = newTicket.getRawObj().conversations ? newTicket.getRawObj().conversations.length : 0
 
       newTicket.note({
         body: 'Hi tom, Still Angry'
@@ -291,7 +300,11 @@ function freshdeskTestRunner() {
 //        , cc_emails: 
       })
       
-      var newNumNotes = newTicket.getRawObj().notes ? newTicket.getRawObj().notes.length : 0
+//      Logger.log(JSON.stringify(newTicket.getRawObj()))
+      
+//      var newNumNotes = newTicket.getRawObj().notes ? newTicket.getRawObj().notes.length : 0
+      var newNumNotes = newTicket.getRawObj().conversations ? newTicket.getRawObj().conversations.length : 0
+      
       t.equal(newNumNotes, numNotes+3, 'new note(2) and reply(1) created')
      
 
