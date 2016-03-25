@@ -898,8 +898,8 @@ var GasFreshdesk = (function () {
             if (options.payload) {
               options.payload = options.payload ? JSON.parse(options.payload) : {}
               
-              if (options.payload.body_html) options.payload.body_html = '...STRIPED...'
-              if (options.payload.description_html) options.payload.description_html = '...STRIPED...'
+              if (options.payload.body) options.payload.body = '...STRIPED...'
+              if (options.payload.description) options.payload.description = '...STRIPED...'
             }
             options = JSON.stringify(options)
             
