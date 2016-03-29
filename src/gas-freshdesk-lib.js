@@ -922,11 +922,15 @@ var GasFreshdesk = (function () {
           break;
           
         default:
-          log(log.DEBUG, 'endpoint: ' + endpoint)
-          log(log.DEBUG, 'options: ' + JSON.stringify(options))
-          log(log.DEBUG, response.getContentText().substring(0,1000))
-          throw Error('api call failed with http code:' + response.getResponseCode())
-          break;
+          var errMsg = [
+            'endpoint: ' + endpoint
+            , 'options: ' + JSON.stringify(options)
+            , response && response.getContentText && response.getContentText().substring(0,1000)
+            , 'api call failed with http code:' + response && response.getResponseCode()
+          ].join(', ')
+          
+          throw Error(errMsg)
+          break
       }
       
       var retContent = response.getContentText()
