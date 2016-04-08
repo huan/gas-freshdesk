@@ -925,8 +925,8 @@ var GasFreshdesk = (function () {
           var errMsg = [
             'endpoint: ' + endpoint
             , 'options: ' + JSON.stringify(options)
-            , response && response.getContentText && response.getContentText().substring(0,1000)
-            , 'api call failed with http code:' + response && response.getResponseCode()
+            , (response ? response.getContentText().substring(0,1000) : '(undefined)')
+            , 'api call failed with http code:' + (response ? response.getResponseCode() : '(undefined)')
           ].join(', ')
           
           throw Error(errMsg)
