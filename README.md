@@ -210,7 +210,7 @@ The GasFreshdesk source code repository is hosted on GitHub. There you can file 
 
 For real-world examples from open-source projects using GasL, see Projects Using TasL on the wiki. ( https://github.com/zixia/gas-freshdesk/wiki )
 
-## Version history
+## HISTORY
 
 ### [v0.3.0(January 20, 2016)](https://github.com/zixia/gas-freshdesk/releases/tag/v0.3.0)<a name="v0.3.0"></a>
 * Switch to [Freshdesk API v2](http://developer.freshdesk.com/api/)
@@ -242,5 +242,16 @@ if ((typeof Freshdesk)==='undefined') { // GasFreshdesk Initialization. (only if
 ### v0.1.0(December 16, 2015)
 * Initial public release.
 
--------------------------------------------
-© 2015 Zhuohuan LI. GasFreshdesk is released under an MIT-style license; see LICENSE for details.
+## AUTHOR
+
+[Huan LI (李卓桓)](http://linkedin.com/in/zixia) \<zixia@zixia.net\>
+
+<a href="https://stackexchange.com/users/265499">
+  <img src="https://stackexchange.com/users/flair/265499.png" width="208" height="58" alt="profile for zixia on Stack Exchange, a network of free, community-driven Q&amp;A sites" title="profile for zixia on Stack Exchange, a network of free, community-driven Q&amp;A sites">
+</a>
+
+## COPYRIGHT & LICENSE
+
+- Code & Docs © 2015-now Huan LI \<zixia@zixia.net\>
+- Code released under MIT-style license; see LICENSE for details.
+- Docs released under Creative Commons
