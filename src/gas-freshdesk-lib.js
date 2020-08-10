@@ -198,7 +198,7 @@ var GasFreshdesk = (function () {
         * 1. existing ticket, retried it by ID
         */
         
-        id = options
+        var id = options
         
         reloadTicket(id)
 
